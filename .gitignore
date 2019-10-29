@@ -8,10 +8,15 @@ __pycache__/
 xmlstarlet/_xmlstarlet.*
 xmlstar/config.h.in~
 xmlstarlet/xml
+xmlstarlet/Makefile
+xmlstarlet/config.status
 **/*.o
 **/*.trs
 **/autom4te.cache/
 **/*/.deps/
+**/solaris/package/*/pkginfo
+**/version.h
+
 
 # Distribution / packaging
 .Python
