@@ -7,6 +7,11 @@ __pycache__/
 *.so
 xmlstarlet/_xmlstarlet.*
 xmlstar/config.h.in~
+xmlstarlet/xml
+**/*.o
+**/*.trs
+**/autom4te.cache/
+**/*/.deps/
 
 # Distribution / packaging
 .Python

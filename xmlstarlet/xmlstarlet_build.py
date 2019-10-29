@@ -2,6 +2,7 @@
 """XMLStarlet CFFI Python bindings build script."""
 import os
 import subprocess
+import sys
 from glob import glob
 
 from cffi import FFI
@@ -12,17 +13,46 @@ C_SOURCE_DIR = os.path.join(SOURCE_DIR, "src")
 
 print(
     subprocess.getoutput(
-        "set -xe && cd xmlstarlet/ && test -f config.h && make -j && set +xe && cd .. "
+        "set -xe && cd xmlstarlet/ "
+        "&& (test -f config.h || (test -f configure && ./configure)) "
+        "&& make -j && make check && set +xe && cd .. "
     )
 )
 
+LIBRARY_DIRS = ["/usr/lib"]
 LIBRARIES = ["xml2", "xslt", "exslt"]
 SOURCES = [
     os.path.relpath(s, ROOT_DIR)
     for s in glob(os.path.join(SOURCE_DIR, "**"), recursive=True)
-    if s.endswith(".c")
+    if s.endswith(".c") and "_xmlstarlet" not in s
 ]
-INCLUDE_DIRS = ["/usr/include", "/usr/include/libxml2", SOURCE_DIR, C_SOURCE_DIR]
+
+if sys.platform == "darwin":
+    EXTRA_CFLAGS = (
+        subprocess.getoutput("xml2-config --cflags").split()
+        + subprocess.getoutput(f"xslt-config --cflags").split()
+    )
+
+    EXTRA_LDFLAGS = (
+        subprocess.getoutput(f"xml2-config --libs").split()
+        + subprocess.getoutput("xslt-config --libs").split()
+    )
+
+    LIBRARY_DIRS += [
+        ld.replace("-L", "") for ld in EXTRA_LDFLAGS if ld.startswith("-L")
+    ]
+    LIBRARIES += [lb.replace("-l", "") for lb in EXTRA_LDFLAGS if lb.startswith("-l")]
+
+    INCLUDE_DIRS = [SOURCE_DIR, C_SOURCE_DIR] + [
+        d.replace("-I", "") for d in EXTRA_CFLAGS if d.startswith("-I")
+    ]
+    LIBRARIES += [lb.replace("-l", "") for lb in EXTRA_CFLAGS if lb.startswith("-l")]
+
+else:
+    EXTRA_CFLAGS = []
+    EXTRA_LDFLAGS = []
+
+    INCLUDE_DIRS = ["/usr/include", "/usr/include/libxml2", SOURCE_DIR, C_SOURCE_DIR]
 
 FFIBUILDER = FFI()
 
@@ -38,9 +68,10 @@ FFIBUILDER.set_source(
 #include <config.h>
 #include <libexslt/exslt.h>
 """,
-    sources=SOURCES,
-    include_dirs=INCLUDE_DIRS,
-    libraries=LIBRARIES,
+    sources=sorted(set(SOURCES)),
+    include_dirs=sorted(set(INCLUDE_DIRS)),
+    libraries=sorted(set(LIBRARIES)),
+    library_dirs=sorted(set(LIBRARY_DIRS)),
 )
 
 # cdef() expects a single string declaring the C types, functions and
