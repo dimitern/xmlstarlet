@@ -1,4 +1,4 @@
-black
+black==19.10b0
 bumpversion==0.5.3
 cffi==1.13.1
 coverage==4.5.4
