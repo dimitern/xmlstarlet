@@ -28,7 +28,7 @@ from xmlstarlet._xmlstarlet import lib as _lib  # pylint: disable=no-name-in-mod
 
 __author__ = """Mikhail Grushinskiy"""
 __email__ = "mgrouch@users.sourceforge.net"
-__version__ = "1.6.2"
+__version__ = "1.6.3"
 
 
 def _call_main(*args, main_func, escape_flag=-1):

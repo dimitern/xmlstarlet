@@ -53,6 +53,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/dimitern/xmlstarlet",
-    version="1.6.2",
+    version="1.6.3",
     zip_safe=False,
 )
