@@ -10,6 +10,7 @@ xmlstar/config.h.in~
 xmlstarlet/xml
 xmlstarlet/Makefile
 xmlstarlet/config.status
+xmlstarlet/config.h
 **/*.o
 **/*.trs
 **/autom4te.cache/
