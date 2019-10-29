@@ -14,8 +14,9 @@ C_SOURCE_DIR = os.path.join(SOURCE_DIR, "src")
 print(
     subprocess.getoutput(
         "set -xe && cd xmlstarlet/ "
-        "&& (test -f config.h || (test -f configure && ./configure)) "
-        "&& make -j && make check && set +xe && cd .. "
+        "&& (test -f config.h && make -j && make check) "
+        "|| (test -f configure && ./configure --prefix=/usr) "
+        "&& (make -j && make check) && set +xe && cd .. "
     )
 )
 

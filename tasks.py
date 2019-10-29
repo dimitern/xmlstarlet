@@ -113,10 +113,12 @@ def clean_build(c):
     """
     c.run("rm -fr build/")
     c.run("rm -fr dist/")
+    c.run(
+        "rm -fr xmlstarlet/config.h " "xmlstarlet/Makefile " "xmlstarlet/config.status"
+    )
     c.run("rm -fr .eggs/")
     c.run("find . -name '*.egg-info' -exec rm -fr {} +")
     c.run("find . -name '*.egg' -exec rm -f {} +")
-    c.run("python setup.py sdist")
 
 
 @task
@@ -128,20 +130,6 @@ def clean_python(c):
     c.run("find . -name '*.pyo' -exec rm -f {} +")
     c.run("find . -name '*~' -exec rm -f {} +")
     c.run("find . -name '__pycache__' -exec rm -fr {} +")
-
-
-@task
-def clean_c(c):
-    """
-    Clean up C file artifacts
-    """
-    c.run("cd xmlstar")
-    c.run("make maintainer-clean-am || true")
-    c.run("rm -f Makefile.in Makefile configure config.* config.h.in~ aclocal.m4")
-    c.run("rm -f install-sh test-driver missing depcomp compile")
-    c.run("cd ..")
-    c.run("cd libxml2 && make distclean || true && cd ..")
-    c.run("cd libxslt && make distclean || true && cd ..")
 
 
 @task
@@ -163,27 +151,11 @@ def clean(c):
 
 
 @task
-def dist_c(c):
-    c.run(
-        "cd xmlstar "
-        "&& autoreconf -sif "
-        "--enable-static-libs "
-        "--enable-maintainer-mode "
-        "--prefix=/usr "
-        "&& make -j "
-        # "&& make tests || true "
-        "; cd .."
-    )
-
-
-@task
 def dist(c):
     """
     Build source and wheel packages
     """
-    c.run("python setup.py sdist")
-    c.run("python setup.py bdist_wheel")
-    c.run("python setup.py develop")
+    c.run("python setup.py sdist bdist_wheel")
 
 
 @task(pre=[clean, dist])
@@ -191,4 +163,4 @@ def release(c):
     """
     Make a release of the python package to pypi
     """
-    c.run("twine upload --verbose dist/*")
+    c.run("twine check --verbose dist/* && twine upload --verbose dist/*")
