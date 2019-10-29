@@ -6,11 +6,10 @@ services:
 before_install:
 - docker pull quay.io/pypa/manylinux2010_x86_64
 script:
-- docker run --rm -e PLAT=manylinux2010_x86_64 -v `pwd`/requirements.txt:/io/requirements.txt
-  -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64:latest /io/build_wheels.sh
+- docker run --rm -e PLAT=manylinux2010_x86_64 -v `pwd`/requirements.txt:/io/requirements.txt -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64:latest /io/build_wheels.sh
 deploy:
   provider: pypi
-  distributions: sdist bdist_wheel
+  distributions: sdist
   user: __token__
   password:
     secure: Xi9I4SRDZlNA14ANZ5KoXHsynHlELBboEMo0DlxJBCHl0bmQ+I/XO9LkcbdEApxuwe01MCylW7SX81Is7+9gGEqeDnck8cUF+YHDbuo7YKjMB29yDlcW+oH9ERuHSFpRocTU4Mki10/88zKRLBgCZg4XUS3H0+7N1U97UPF3vWr+MIDcSSGdiZVEjZVMuA4jnyaPoecLKn/N5cRqaJd+s+OpLwKw9rxdZGz3Cp5+c164klQZFnsEC854VkoZVeM3m2U0sUondHWi2FQhCD+JGbDwm0wPbuB8SyeMN2uVVMuKlxbODZXFN0GMgwcsa2KDC4KxsIQIYMHFnyHdmwgTgp1iSS2kWbA5lI66aZDzouM5g+1VE7pN+P7IhUCSFdUUKrO9H1lNwFgnYR/FjrRAxng6w4KsuUZRf0W66CEQQ7X5QrpRTpPW0x2KhTsSYxQSNORbDtwMgNpr+hYVpz4j86iK87QLibLe6rYCMr6PwPcuftbnQtoXwqvRvjOijYympvHgr26FpEbQ8dBDbc1ErjWoVvaaKzk/O3Yw3hu2d5xZ1anV9CQgcN235VlgbsUTHpz+kB5wjTRZFbSvsftRSblr2k2iCvE0jfYUUKLdUAAg4tQkWcwV6Z4WTkMfbGW1jvaaW9rpE3RTbkVbeDxMMJoSjm2afCECJ39RJE/Huqk=

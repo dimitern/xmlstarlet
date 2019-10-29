@@ -20,6 +20,8 @@ for PYBIN in /opt/python/*/bin; do
     fi
     set -x
 
+    cat ${PYPI_RC:-/root/.pypirc} || true
+
     pushd /io/ > /dev/null 2>&1
     "${PYBIN}/pip" install -U pip setuptools wheel
     "${PYBIN}/pip" install -r requirements.txt
@@ -28,7 +30,7 @@ for PYBIN in /opt/python/*/bin; do
     "${PYBIN}/pip" install xmlstarlet --no-index -f dist && "${PYBIN}/pytest" -v
     "${PYBIN}/twine" check dist/* || exit 1
     rm -f dist/*linux_x64_32* dist/*.tar.* || true
-    "${PYBIN}/twine" upload dist/* || true
+    "${PYBIN}/twine" upload --config-file=/root/.pypirc dist/* || true
     rm -fr build/* dist/* || true
     popd > /dev/null 2>&1
 done
