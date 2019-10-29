@@ -1,0 +1,11 @@
+<element name="h:html" xmlns="http://relaxng.org/ns/structure/1.0" xmlns:h="urn:local:html">
+  <element name="h:body">
+    <element name="h:p">
+      <element name="h:a">
+        <attribute name="h:href"/>
+        <text/>
+      </element>
+    </element>
+  </element>
+</element>
+

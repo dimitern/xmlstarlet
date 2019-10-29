@@ -1,0 +1,23 @@
+language: python
+python:
+- 3.7
+
+services:
+- docker
+
+before_install:
+- docker pull quay.io/pypa/manylinux2010_x86_64
+
+script:
+- docker run --rm -e PLAT=manylinux2010_x86_64 -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64:latest io/build_wheels.sh
+
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: dimitern
+  password:
+    secure: crE5XgFf/4sJ5HnfDLvAXQwefqtgxa57qTpQmp2QezfBlNNlTgkApJ/hWZIkBZ0HciUkBCgdGqR6l6BRBLHKibUPXB4KWyEHET7DIDA9NR1+XEPJpTIW1TxCQB+KFEMN8K62H9eJsLLoISE+xHjJwXPp10jXLs4lcl5xf/ygPsNLMXAxPitbDlwuRjFAxmCQNhLDp8CVAb9DXPtyXBt9D4/WLAfcMGGpIoNBmRqa5SFwmsNyKa0B5fOdnyWagcIE/s6lGKOSgVQwTBWj5NP9R1fIqzWVH+RJW1L1oNqA5OT6GwhYp1LNaZSnH5RCR9/R7Dt48PIBFrQRB++TA1fLi8QzFm/iJ2gnYoT5hWI8/PX8mPVb+N7jnEIf/hFxDE9fZNH6Z2dYqkfiKyIbjelw0Cmz8BgRlgTDboraJsmdC3NK1Ve3R73n1n1l15LI5IJLThytK8m30x7ogqdrcwM8Cpbq1XfJi+f53+IZrONOBFwLGOWZ9vNUnTGeRNZEEXB0fImpjNp0FfkBQJv7kpgtEj2Ta2EpP9VVDktBzTvrKCaunUjFycFN/JkxQOlP5pw7xJRYd4+VwI0JxYRi62mMLyTsJTGJhqCczwMkCfJwXsC49KEPPFjvJ8CHS6Cg9d5aEkg3JJBS+JDmQkr2tHb7VOyssef+IbjSLiJ0F/f+P+s=
+  on:
+    tags: true
+    repo: dimitern/xmlstarlet
+    python: 3.7

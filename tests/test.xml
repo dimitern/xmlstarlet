@@ -1,0 +1,9 @@
+<h:html xmlns:h="urn:local:html">
+        <h:body>
+                <h:p>
+                        <h:a h:href="#">
+                                Link
+                        </h:a>
+                </h:p>
+        </h:body>
+</h:html>
