@@ -20,10 +20,12 @@ for PYBIN in /opt/python/*/bin; do
     fi
     set -x
 
+    pushd /io/ > /dev/null 2>&1
     "${PYBIN}/pip" install -U pip setuptools wheel
-    "${PYBIN}/pip" install -r /io/requirements.txt
-    "${PYBIN}/python" /io/setup.py sdist bdist_wheel
-    auditwheel repair /io/dist/*.whl --plat $PLAT -w /io/dist/
-    "${PYBIN}/pip" install xmlstarlet --no-index -f /io/dist && "${PYBIN}/pytest" -v
-    "${PYBIN}/twine" check /io/dist/* && "${PYBIN}/twine" upload io/dist/*
+    "${PYBIN}/pip" install -r requirements.txt
+    "${PYBIN}/python" setup.py sdist bdist_wheel
+    auditwheel repair dist/*.whl --plat $PLAT -w dist/
+    "${PYBIN}/pip" install xmlstarlet --no-index -f dist && "${PYBIN}/pytest" -v
+    "${PYBIN}/twine" check dist/* && "${PYBIN}/twine" upload io/dist/*
+    popd /io/ > /dev/null 2>&1
 done
