@@ -4,6 +4,8 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
+include xmlstarlet_build.py
+
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

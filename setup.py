@@ -48,7 +48,7 @@ setup(
     name="xmlstarlet",
     packages=find_packages(include=["xmlstarlet"]),
     setup_requires=setup_requirements,
-    cffi_modules=["xmlstarlet/xmlstarlet_build.py:FFIBUILDER"],
+    cffi_modules=["xmlstarlet_build.py:FFIBUILDER"],
     python_requires=">=3.6.*",
     test_suite="tests",
     tests_require=test_requirements,
