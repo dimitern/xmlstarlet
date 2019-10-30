@@ -16,6 +16,7 @@ print(
         "set -xe && cd xmlstarlet/ "
         "&& (test -f config.h && make -j && make check) "
         "|| (test -f configure && ./configure --prefix=/usr) "
+        "|| (autoreconf -sif && ./configure --prefix=/usr) "
         "&& (make -j && make check) && set +xe && cd .. "
     )
 )
