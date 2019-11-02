@@ -29,7 +29,7 @@ SOURCES = [
     if s.endswith(".c") and "_xmlstarlet" not in s
 ]
 
-if sys.platform == "darwin":
+if sys.platform in ("darwin", "linux"):
     EXTRA_CFLAGS = (
         subprocess.getoutput("xml2-config --cflags").split()
         + subprocess.getoutput(f"xslt-config --cflags").split()
