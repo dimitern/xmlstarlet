@@ -2,7 +2,7 @@ black==19.10b0
 bumpversion==0.5.3
 cffi==1.13.2
 coverage==5.0.3
-docutils==0.15.2
+docutils==0.16
 flake8==3.7.9
 invoke==1.4.0
 isort==4.3.21
