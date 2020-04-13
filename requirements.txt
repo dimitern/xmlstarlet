@@ -1,7 +1,7 @@
 black==19.10b0
 bumpversion==0.5.3
 cffi==1.14.0
-coverage==5.0.4
+coverage==5.1
 docutils==0.16
 flake8==3.7.9
 invoke==1.4.1
