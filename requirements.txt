@@ -9,7 +9,7 @@ isort==4.3.21
 pycparser==2.20
 pylint==2.4.4
 pytest==5.4.1
-Sphinx==3.0.1
+Sphinx==3.0.2
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
 sphinxcontrib-htmlhelp==1.0.3
