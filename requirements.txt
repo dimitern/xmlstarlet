@@ -7,7 +7,7 @@ flake8==3.8.0
 invoke==1.4.1
 isort==4.3.21
 pycparser==2.20
-pylint==2.5.0
+pylint==2.5.2
 pytest==5.4.1
 Sphinx==3.0.3
 sphinxcontrib-applehelp==1.0.2
