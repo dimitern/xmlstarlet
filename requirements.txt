@@ -3,7 +3,7 @@ bumpversion==0.5.3
 cffi==1.14.0
 coverage==5.1
 docutils==0.16
-flake8==3.7.9
+flake8==3.8.0
 invoke==1.4.1
 isort==4.3.21
 pycparser==2.20
