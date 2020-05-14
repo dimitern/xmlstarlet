@@ -1,5 +1,5 @@
 black==19.10b0
-bumpversion==0.5.3
+bumpversion==0.6.0
 cffi==1.14.0
 coverage==5.1
 docutils==0.16
