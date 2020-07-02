@@ -18,5 +18,5 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 tox==3.16.1
 twine==3.2.0
-auditwheel==3.1.1
+auditwheel==3.2.0
 wheel==0.31.1  # pyup: ==0.31.1 # auditwheel requires wheel <=0.31.1 (pypa/auditwheel #102)
