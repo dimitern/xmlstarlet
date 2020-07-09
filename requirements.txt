@@ -5,7 +5,7 @@ coverage==5.1
 docutils==0.16
 flake8==3.8.3
 invoke==1.4.1
-isort==5.0.5
+isort==5.0.6
 pycparser==2.20
 pylint==2.5.3
 pytest==5.4.3
