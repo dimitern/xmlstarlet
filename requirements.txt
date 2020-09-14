@@ -8,7 +8,7 @@ invoke==1.4.1
 isort==5.5.2
 pycparser==2.20
 pylint==2.6.0
-pytest==6.0.1
+pytest==6.0.2
 Sphinx==3.2.1
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
