@@ -163,4 +163,4 @@ def release(c):
     """
     Make a release of the python package to pypi
     """
-    c.run("twine check --verbose dist/* && twine upload --verbose dist/*")
+    c.run("twine check dist/* && twine upload --verbose dist/*")
