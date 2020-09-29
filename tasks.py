@@ -51,7 +51,7 @@ def format(c, check=False):
     # Run black
     c.run("black {}".format(python_dirs_string))
     # Run isort
-    isort_options = "--recursive {}".format("--check-only" if check else "")
+    isort_options = "{}".format("--check-only" if check else "")
     c.run("isort {} {}".format(isort_options, python_dirs_string))
 
 
