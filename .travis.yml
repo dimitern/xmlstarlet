@@ -6,7 +6,7 @@ services:
 before_install:
 - docker pull quay.io/pypa/manylinux2010_x86_64
 script:
-- docker run --rm -e PLAT=manylinux2010_x86_64 -v `pwd`/requirements.txt:/io/requirements.txt
+- docker run --rm -e PLAT=manylinux2010_x86_64 -e PYPI_TOKEN=$PYPI_TOKEN -v `pwd`/requirements.txt:/io/requirements.txt
   -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64:latest /io/build_wheels.sh
 deploy:
   provider: pypi

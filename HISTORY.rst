@@ -2,6 +2,11 @@
 History
 =======
 
+1.6.5 (2020-09-29)
+------------------
+
+* No changes from previous release except up-to-date dependencies and some build fixes.
+
 1.6.3 (2019-10-29)
 ------------------
 
