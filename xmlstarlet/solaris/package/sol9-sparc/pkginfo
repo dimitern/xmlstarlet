@@ -3,7 +3,7 @@
 PKG=SFxmlstar
 NAME="xmlstarlet Command Line XML Toolkit"
 ARCH=sparc
-VERSION=v1.6.3-9-g4edf5c3
+VERSION=v1.6.3-249-ge436ed1-dirty
 MAXINST=1
 CATEGORY=application
 DESC="XmlStarlet Command Line XML Toolkit"
