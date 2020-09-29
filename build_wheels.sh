@@ -26,10 +26,13 @@ for PYBIN in /opt/python/*/bin; do
     "${PYBIN}/python" setup.py sdist bdist_wheel
     auditwheel repair dist/*.whl --plat $PLAT -w dist/
     "${PYBIN}/pip" install xmlstarlet --no-index -f dist && "${PYBIN}/pytest" -v
+    
+    set +x
     "${PYBIN}/twine" check dist/* || exit 1
-    "${PYBIN}/python" -m keyring set https://upload.pypi.org/legacy/ __token__
     rm -f dist/*linux_x64_32* dist/*.tar.* || true
-    "${PYBIN}/twine" upload -r pypi -u __token__ -p $PYPI_TOKEN --noin-interactive dist/* || true
+    "${PYBIN}/twine" upload -r pypi -u __token__ -p $PYPI_TOKEN --non-interactive dist/* || true
+    set -x
+
     rm -fr build/* dist/* || true
     popd > /dev/null 2>&1
 done
