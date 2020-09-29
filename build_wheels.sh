@@ -26,7 +26,8 @@ for PYBIN in /opt/python/*/bin; do
     "${PYBIN}/python" setup.py sdist bdist_wheel
     auditwheel repair dist/*.whl --plat $PLAT -w dist/
     "${PYBIN}/pip" install xmlstarlet --no-index -f dist && "${PYBIN}/pytest" -v
-    
+    rm -v dist/*-linux_x86_64.whl || true
+
     set +x
     "${PYBIN}/twine" check dist/* || exit 1
     rm -f dist/*linux_x64_32* dist/*.tar.* || true
