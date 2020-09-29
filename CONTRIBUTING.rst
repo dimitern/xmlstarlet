@@ -64,33 +64,46 @@ Ready to contribute? Here's how to set up `xmlstarlet` for local development.
 
     $ git clone git@github.com:your_name_here/xmlstarlet.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy into a virtualenv. Assuming you have Python 3 installed,
+   this is how you set up your fork for local development::
 
     $ cd xmlstarlet/
     $ python3 -m venv .venv
     $ source .venv/bin/activate
     $ pip install -r requirements.txt
-    $ invoke clean lint format dist test
+
+The following one-liner command goes through all steps: cleans all
+build artifacts (if any), uninstalls the package (if installed), runs
+the linters (asserting scores haven't gone down and no new issues are
+found), the formatter (checking formatting won't change any of the files),
+builds a source distribution, then a binary wheel, running all tests,
+producing a coverage HTML report, and finally building the sphinx HTML,
+displayed in a browser on completion::
+
+    $ invoke clean --uninstall lint format --check dist --wheel test coverage docs --browser
 
 4. Create a branch for local development::
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
-   Now you can make your changes locally.
+Now you can make your changes locally.
 
 5. When you're done making changes, check that your changes pass flake8 and the
    tests, including testing other Python versions with tox::
 
-    $ invoke format lint test
+    $ invoke format lint test  # optional; tox runs those as well
     $ tox
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+Both `invoke` and `tox` are already installed from `requirements.txt`.
+To re-create all the `tox` environments and run all matrix combinations::
+
+   $ tox -r -e ALL  # equivalent to `invoke clean-tests --tox`
 
 6. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
-    $ git push origin name-of-your-bugfix-or-feature
+    $ git push -u origin name-of-your-bugfix-or-feature
 
 7. Submit a pull request through the GitHub website.
 
@@ -103,27 +116,33 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4, 3.5, 3.6, 3.7, 3.8 and for PyPy. Check
-   https://travis-ci.org/dimitern/xmlstarlet/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.6 and later (currently, up to 3.9).
+   Check https://github.com/dimitern/xmlstarlet/pulls and make sure all checks
+   pass OK. Binary wheels are built automatically for each PR, or `git push` to
+   a branch.
 
 Tips
 ----
 
 To run a subset of tests::
 
-$ py.test tests.test_xmlstarlet
+  $ pytest tests.test_xmlstarlet
 
+(`python setup.py test` will also work as alias of `pytest`).
 
 Deploying
 ---------
 
 A reminder for the maintainers on how to deploy.
+
 Make sure all your changes are committed (including an entry in HISTORY.rst).
 Then run::
 
-$ bumpversion patch # possible: major / minor / patch
-$ git push
-$ git push --tags
+  $ invoke release --dry-run
 
-Travis will then deploy to PyPI if tests pass.
+This runs `tox`, and then displays how the new version will look like,
+without pushing anything.
+
+If it goes OK, make the actual release with::
+
+  $ invoke release
