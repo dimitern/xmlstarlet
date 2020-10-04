@@ -87,7 +87,7 @@ function usage()
 	txt += "  iconv:      Use iconv library (" + (withIconv? "yes" : "no")  + ")\n";
 	txt += "  zlib:       Use zlib library (" + (withZlib? "yes" : "no") + ")\n";
 	txt += "\nWin32 build options, default value given in parentheses:\n\n";
-	txt += "  arch:       Architecture / Plaform (x86 or amd64) [msvc] (" + platform + ")\n";
+	txt += "  arch:       Architecture / Platform (x86 or amd64) [msvc] (" + platform + ")\n";
 	txt += "  compiler:   Compiler to be used [msvc] (" + compiler + ")\n";
 	txt += "  cruntime:   C-runtime compiler option (only msvc) (" + cruntime + ")\n";
 	txt += "  vcmanifest: Embed VC manifest (only msvc) (" + (vcmanifest? "yes" : "no") + ")\n";
@@ -291,7 +291,7 @@ txtOut += "          Compiler: " + compiler + "\n";
 if (compiler == "msvc")
 	txtOut += "  C-Runtime option: " + cruntime + "\n";
 	txtOut += "    Embed Manifest: " + boolToStr(vcmanifest) + "\n";
-txtOut += "   Arch / Platform: " + plaform + "\n";
+txtOut += "   Arch / Platform: " + platform + "\n";
 txtOut += "     Debug symbols: " + boolToStr(buildDebug) + "\n";
 txtOut += "      Static build: " + boolToStr(buildStatic) + "\n";
 txtOut += "    Install prefix: " + buildPrefix + "\n";
