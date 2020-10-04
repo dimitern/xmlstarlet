@@ -63,6 +63,11 @@ LDFLAGS = $(LDFLAGS) /DEBUG
 CFLAGS = $(CFLAGS) /D "NDEBUG" /O2 
 !endif
 
+# Fix "undefined symbol __except_handler4_common" on x86
+!if "$(Platform)" == "x86"
+LIBS = $(LIBS) vcruntime.lib
+!endif
+
 # Usage texts used to generate USAGE_SOURCES.
 USAGE_TEXTS = $(SRCDIR)\usage.txt\
     $(SRCDIR)\c14n-usage.txt\

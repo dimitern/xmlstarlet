@@ -10,8 +10,8 @@ recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
-recursive-exclude * *.o *.Po *~
-
 recursive-include docs *.rst conf.py *.jpg *.png *.gif
 
-recursive-include xmlstarlet *
+recursive-exclude * *.o *~ *.obj .?*/** *.pyc *.cache __pycache__
+
+recursive-include xmlstarlet * *.Po
