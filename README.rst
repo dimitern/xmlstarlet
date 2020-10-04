@@ -4,19 +4,19 @@ XMLStarlet CFFI
 
 
 .. image:: https://img.shields.io/pypi/v/xmlstarlet.svg
-        :target: https://pypi.python.org/pypi/xmlstarlet
+     :target: https://pypi.python.org/pypi/xmlstarlet
 
-.. image:: https://img.shields.io/travis/dimitern/xmlstarlet.svg
-        :target: https://travis-ci.org/dimitern/xmlstarlet
+.. image:: https://github.com/dimitern/xmlstarlet/workflows/Build%20and%20upload%20to%20PyPI/badge.svg?branch=master&event=push
+     :target: https://github.com/dimitern/xmlstarlet/actions?query=event%3Apush+branch%3Amaster+workflow%3A"Build+and+upload+to+PyPI"
+     :alt: cibuildwheel & PyPI
 
 .. image:: https://readthedocs.org/projects/xmlstarlet/badge/?version=latest
-        :target: https://xmlstarlet.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+     :target: https://xmlstarlet.readthedocs.io/en/latest/?badge=latest
+     :alt: Documentation Status
 
 .. image:: https://pyup.io/repos/github/dimitern/xmlstarlet/shield.svg
      :target: https://pyup.io/repos/github/dimitern/xmlstarlet/
      :alt: Updates
-
 
 
 XMLStarlet Toolkit: Python CFFI bindings
@@ -49,10 +49,16 @@ For some examples, have a look at `tests/test_xmlstarlet.py`.
 Credits
 -------
 
+Kudos to XMLStarlet and its maintainers and users (original sources on SourceForge_)!
+
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
-Dependencies scanned by PyUp.io_
+Binary wheels built via GitHub Actions by cibuildwheel_
 
+Development `requirements.txt` dependencies scanned by PyUp.io_
+
+.. _SourceForge: https://sourceforge.net/projects/xmlstar/
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _cibuildwheel: https://github.com/joerick/cibuildwheel
 .. _PyUp.io: https://pyup.io
