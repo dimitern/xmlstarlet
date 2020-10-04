@@ -23,10 +23,10 @@ Each of these functions takes string arguments and returns the integer exit code
 (0 = success, otherwise an error occured).
 """
 
-from xmlstarlet._xmlstarlet import \
-    ffi as _ffi  # pylint: disable=no-name-in-module
-from xmlstarlet._xmlstarlet import \
-    lib as _lib  # pylint: disable=no-name-in-module
+import xmlstarlet._xmlstarlet
+
+_ffi = xmlstarlet._xmlstarlet.ffi  # pylint: disable=protected-access
+_lib = xmlstarlet._xmlstarlet.lib  # pylint: disable=protected-access
 
 __author__ = """Mikhail Grushinskiy"""
 __email__ = "mgrouch@users.sourceforge.net"

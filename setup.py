@@ -37,6 +37,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     description="XMLStarlet Toolkit: Python CFFI bindings",
     install_requires=requirements,

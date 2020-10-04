@@ -13,7 +13,6 @@ XMLStarlet CFFI
         :target: https://xmlstarlet.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
 .. image:: https://pyup.io/repos/github/dimitern/xmlstarlet/shield.svg
      :target: https://pyup.io/repos/github/dimitern/xmlstarlet/
      :alt: Updates
@@ -39,7 +38,7 @@ Supports all XMLStarlet commands from Python, just `import xmlstarlet`:
 * `format(*args)`: Format XML document(s)
 * `elements(*args)`: Display element structure of XML document
 * `canonicalize(*args)`: XML canonicalization
-* `listdir(*args)`: List directory as XML
+* `listdir(*args)`: List directory as XML (**NOT** supported on Windows)
 * `escape(*args)`: Escape special XML characters
 * `unescape(*args)`: Unescape special XML characters
 * `pyx(*args)`: Convert XML into PYX format (based on ESIS - ISO 8879)

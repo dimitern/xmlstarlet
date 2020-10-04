@@ -10,7 +10,7 @@ recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
-recusrive-exclude * *.o *.Po *~
+recursive-exclude * *.o *.Po *~
 
 recursive-include docs *.rst conf.py *.jpg *.png *.gif
 

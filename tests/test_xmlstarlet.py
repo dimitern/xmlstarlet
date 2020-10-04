@@ -78,7 +78,11 @@ def test_format():
 
 
 def test_listdir():
-    assert xmlstarlet.listdir() == 0
+    # ls is not supported on Windows.
+    expected = 0
+    if os.name == "nt":
+        expected = 1
+    assert xmlstarlet.listdir() == expected
 
 
 def test_transform():
