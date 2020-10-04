@@ -6,9 +6,9 @@ XMLStarlet CFFI
 .. image:: https://img.shields.io/pypi/v/xmlstarlet.svg
      :target: https://pypi.python.org/pypi/xmlstarlet
 
-.. image:: https://github.com/dimitern/xmlstarlet/workflows/Build%20and%20upload%20to%20PyPI/badge.svg?branch=master&event=push
-     :target: https://github.com/dimitern/xmlstarlet/actions?query=event%3Apush+branch%3Amaster+workflow%3A"Build+and+upload+to+PyPI"
-     :alt: cibuildwheel & PyPI
+.. image:: https://github.com/dimitern/xmlstarlet/workflows/cibuildwheel/badge.svg?branch=master&event=push
+     :target: https://github.com/dimitern/xmlstarlet/actions?query=event%3Apush+branch%3Amaster+workflow%3Acibuildwheel
+     :alt: cibuildwheel
 
 .. image:: https://readthedocs.org/projects/xmlstarlet/badge/?version=latest
      :target: https://xmlstarlet.readthedocs.io/en/latest/?badge=latest

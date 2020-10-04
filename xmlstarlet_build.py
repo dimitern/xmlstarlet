@@ -69,8 +69,7 @@ if os.name != "nt":
         print("Running `./configure` to create a Makefile...")
         exit_code, output = subprocess.getstatusoutput(
             "cd ./xmlstarlet/ && ./configure --prefix={0} --includedir={1} && cd  ..".format(
-                os.environ["CONFIG_PREFIX"],
-                os.environ["INCLUDE_PATH"],
+                os.environ["CONFIG_PREFIX"], os.environ["INCLUDE_PATH"],
             )
         )
 
@@ -115,6 +114,8 @@ else:
         "ws2_32",
         "shell32",
     ]
+    if os.environ.get("Platform", "") == "x86":
+        LIBRARIES += ["vcruntime"]
 
 sources = sorted(set(SOURCES))
 include_dirs = sorted(set(INCLUDE_DIRS))

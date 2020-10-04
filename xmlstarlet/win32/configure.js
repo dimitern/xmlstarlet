@@ -9,7 +9,8 @@
  * March 2002, Igor Zlatkovic <igor@zlatkovic.com>
  * October 2020,  Dimiter Naydenov <dimiter@naydenov.net>
  */
-
+var wsh = new ActiveXObject("WScript.Shell");
+var platform = wsh.ExpandEnvironmentStrings("%Platform%") || "";
 /* The source directory, relative to the one where this file resides. */
 var baseDir = "..";
 var srcDir = baseDir + "\\src";
@@ -86,6 +87,7 @@ function usage()
 	txt += "  iconv:      Use iconv library (" + (withIconv? "yes" : "no")  + ")\n";
 	txt += "  zlib:       Use zlib library (" + (withZlib? "yes" : "no") + ")\n";
 	txt += "\nWin32 build options, default value given in parentheses:\n\n";
+	txt += "  arch:       Architecture / Plaform (x86 or amd64) [msvc] (" + platform + ")\n";
 	txt += "  compiler:   Compiler to be used [msvc] (" + compiler + ")\n";
 	txt += "  cruntime:   C-runtime compiler option (only msvc) (" + cruntime + ")\n";
 	txt += "  vcmanifest: Embed VC manifest (only msvc) (" + (vcmanifest? "yes" : "no") + ")\n";
@@ -179,6 +181,8 @@ for (i = 0; (i < WScript.Arguments.length) && (error == 0); i++) {
 	if (opt.length > 0) {
 		if (opt == "debug")
 			buildDebug = strToBool(arg.substring(opt.length + 1, arg.length));
+        else if (opt == "arch")
+            platform = opt;
 		else if (opt == "iconv")
 			withIconv = strToBool(arg.substring(opt.length + 1, arg.length));
 		else if (opt == "zlib")
@@ -287,6 +291,7 @@ txtOut += "          Compiler: " + compiler + "\n";
 if (compiler == "msvc")
 	txtOut += "  C-Runtime option: " + cruntime + "\n";
 	txtOut += "    Embed Manifest: " + boolToStr(vcmanifest) + "\n";
+txtOut += "   Arch / Platform: " + plaform + "\n";
 txtOut += "     Debug symbols: " + boolToStr(buildDebug) + "\n";
 txtOut += "      Static build: " + boolToStr(buildStatic) + "\n";
 txtOut += "    Install prefix: " + buildPrefix + "\n";
