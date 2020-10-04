@@ -3,6 +3,8 @@ Tasks for maintaining the project.
 
 Execute 'invoke --list' for guidance on using Invoke
 """
+# pylint: disable=invalid-name
+
 import platform
 import shutil
 import webbrowser
@@ -42,29 +44,45 @@ def _delete_file(file):
             pass
 
 
-@task(help={"check": "Checks if source is formatted without applying changes"})
+@task(
+    help={
+        "wheel": "Build a binary wheel in addition to source package",
+    }
+)
+def dist(c, wheel=False):
+    """
+    Build source and (optionally) a binary wheel packages, optionally installing it.
+    """
+    commands = "sdist" if not wheel else "sdist bdist_wheel"
+    c.run("python {} {}".format(SETUP_FILE, commands))
+
+
+@task(
+    pre=[dist], help={"check": "Checks if source is formatted without applying changes"}
+)  # pylint: disable=redefined-builtin
 def format(c, check=False):
     """
     Format code
     """
     python_dirs_string = " ".join(PYTHON_DIRS)
     # Run black
-    c.run("black {}".format(python_dirs_string))
+    black_options = "--check" if check else ""
+    c.run("black {} . {}".format(black_options, python_dirs_string))
     # Run isort
-    isort_options = "{}".format("--check-only" if check else "")
+    isort_options = "--check-only" if check else ""
     c.run("isort {} {}".format(isort_options, python_dirs_string))
 
 
-@task
+@task(pre=[dist])
 def lint(c):
     """
     Lint code
     """
-    c.run("flake8 {}".format(SOURCE_DIR))
-    c.run("pylint {}".format(SOURCE_DIR))
+    c.run("flake8 *.py")
+    c.run("pylint --rcfile=setup.cfg *.py")
 
 
-@task
+@task(pre=[dist])
 def test(c):
     """
     Run tests
@@ -73,8 +91,13 @@ def test(c):
     c.run("python {} test".format(SETUP_FILE), pty=pty)
 
 
-@task(help={"publish": "Publish the result via coveralls"})
-def coverage(c, publish=False):
+@task(
+    help={
+        "publish": "Publish the result via coveralls (not working)",
+        "browser": "Open the local HTML coverage report in the default browser",
+    }
+)
+def coverage(c, publish=False, browser=False):
     """
     Create coverage report
     """
@@ -83,19 +106,21 @@ def coverage(c, publish=False):
     if publish:
         # Publish the results via coveralls
         c.run("coveralls")
-    else:
-        # Build a local report
-        c.run("coverage html")
+
+    # Build a local report
+    c.run("coverage html")
+    if browser:
         webbrowser.open(COVERAGE_REPORT.as_uri())
 
 
-@task
-def docs(c):
+@task(help={"browser": "Open the built documentation in the default browser"})
+def docs(c, browser=False):
     """
     Generate documentation
     """
     c.run("sphinx-build -b html {} {}".format(DOCS_DIR, DOCS_BUILD_DIR))
-    webbrowser.open(DOCS_INDEX.as_uri())
+    if browser:
+        webbrowser.open(DOCS_INDEX.as_uri())
 
 
 @task
@@ -132,35 +157,45 @@ def clean_python(c):
     c.run("find . -name '__pycache__' -exec rm -fr {} +")
 
 
-@task
-def clean_tests(c):
+@task(
+    help={"tox": "Clean tox directory {!r} as well"}
+)  # pylint: disable=unused-argument
+def clean_tests(c, tox=False):
     """
     Clean up files from testing
     """
     _delete_file(COVERAGE_FILE)
-    shutil.rmtree(TOX_DIR, ignore_errors=True)
+    if tox:
+        shutil.rmtree(TOX_DIR, ignore_errors=True)
     shutil.rmtree(COVERAGE_DIR, ignore_errors=True)
 
 
-@task(pre=[clean_build, clean_python, clean_tests, clean_docs])
-def clean(c):
+@task(
+    pre=[clean_build, clean_python, clean_tests, clean_docs],
+    help={"uninstall": "Also uninstall the package (if installed)"},
+)
+def clean(c, uninstall=False):
     """
     Runs all clean sub-tasks
     """
-    pass
+    if uninstall:
+        c.run("pip uninstall -y xmlstarlet")
 
 
-@task
-def dist(c):
+@task(
+    pre=[clean],
+    help={"dry-run": "Only display what will change, do NOT commit/tag/push"},
+)
+def release(c, dry_run=False):
     """
-    Build source and wheel packages
+    Run all tox tests, and if successful, bump the patch
+    version of the package, commit and tag it, then push
+    to GitHub. If `dry_run` is True, no commit or push is
+    done. Working directory must be clean (no uncommited
+    changes).
     """
-    c.run("python setup.py sdist bdist_wheel")
+    c.run("tox {}".format("--skip-pkg-install -e py37" if not dry_run else ""))
+    c.run("bump2version {} --verbose patch".format("--dry-run" if dry_run else ""))
 
-
-@task(pre=[clean, dist])
-def release(c):
-    """
-    Make a release of the python package to pypi
-    """
-    c.run("twine check dist/* && twine upload --verbose dist/*")
+    if not dry_run:
+        c.run("git push --tags")
