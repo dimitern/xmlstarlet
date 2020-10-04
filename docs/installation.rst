@@ -14,7 +14,14 @@ To install XMLStarlet CFFI, run this command in your terminal:
 
     $ pip install xmlstarlet
 
-This is the preferred method to install XMLStarlet CFFI, as it will always install the most recent stable release.
+This is the preferred method to install XMLStarlet CFFI, as it will always install the most recent
+stable release from https://pypi.org.
+
+Binary wheels are automatically built and published for all major OS platforms
+(Linux, MacOS, and Windows), as well as source packages on every tagged release.
+
+Supported and tested on (64-bit) Python versions from 3.6+.
+
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -38,7 +45,7 @@ Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/dimitern/xmlstarlet/tarball/master
+    $ curl -OL https://github.com/dimitern/xmlstarlet/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -46,6 +53,7 @@ Once you have a copy of the source, you can install it with:
 
     $ python setup.py install
 
+Ideally, you would do this inside a `virtualenv`.
 
 .. _Github repo: https://github.com/dimitern/xmlstarlet
 .. _tarball: https://github.com/dimitern/xmlstarlet/tarball/master
