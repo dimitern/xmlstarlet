@@ -87,8 +87,7 @@ jobs:
         run: |
           sudo apt-get install -yqq libxslt1-dev libxml2-dev
           python -m pip --disable-pip-version-check install -r requirements.txt
-          python setup.py install
-          invoke test coverage
+          pytest --no-cov
 
       - uses: actions/upload-artifact@v2
         with:
