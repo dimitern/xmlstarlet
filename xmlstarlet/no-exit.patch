@@ -1,0 +1,1336 @@
+diff --git a/xmlstarlet/src/trans.c b/xmlstarlet/src/trans.c
+index 3603436..7237ab6 100644
+--- a/xmlstarlet/src/trans.c
++++ b/xmlstarlet/src/trans.c
+@@ -65,7 +65,7 @@ xsltInitLibXml(xsltOptionsPtr ops)
+     if (ops->show_extensions)
+     {
+         xsltDebugDumpExtensions(stderr);
+-        exit(EXIT_SUCCESS);
++        return;
+     }
+ 
+     xmlKeepBlanksDefault(1);
+diff --git a/xmlstarlet/src/xml.c b/xmlstarlet/src/xml.c
+index cf47cc2..f4e3091 100644
+--- a/xmlstarlet/src/xml.c
++++ b/xmlstarlet/src/xml.c
+@@ -74,14 +74,14 @@ const char libxslt_more_info[] =
+ /**
+  *  Display usage syntax
+  */
+-void
++int
+ usage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_usage(FILE* o, const char* argv0);
+     FILE* o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }  
+ 
+ /**
+@@ -156,7 +156,7 @@ void reportError(void *ptr, xmlErrorPtr error)
+         }
+     }
+     if (errorInfo->stop == STOP) {
+-        exit(EXIT_FAILURE);
++        return;
+     }
+ }
+ 
+@@ -168,7 +168,7 @@ suppressErrors(void)
+ }
+ 
+ #define CHECK_MEM(ret) if (!ret) \
+-        (fprintf(stderr, "out of memory\n"), exit(EXIT_INTERNAL_ERROR))
++        (fprintf(stderr, "out of memory\n"), EXIT_INTERNAL_ERROR)
+ 
+ void*
+ xmalloc(size_t size)
+@@ -196,7 +196,7 @@ xstrdup(const char *str)
+ #ifdef _WIN32
+ /* On Windows, it's not really practical to get argv in UTF-8, so we have to do
+    this little dance. */
+-static void
++static int
+ gGetUnicodeOptions(int argc, char **argv)
+ {
+     int nArgs, i;
+@@ -210,7 +210,7 @@ gGetUnicodeOptions(int argc, char **argv)
+             NULL, 0, NULL, NULL);
+         if (utflen <= 0) {
+             fprintf(stderr, "Error decoding argument %d\n", i);
+-            exit(EXIT_BAD_ARGS);
++            return EXIT_BAD_ARGS;
+         }
+         utf = malloc(utflen);
+         WideCharToMultiByte(CP_UTF8, 0,
+@@ -221,13 +221,13 @@ gGetUnicodeOptions(int argc, char **argv)
+     LocalFree(szArglist);
+ }
+ #else
+-#  define gGetUnicodeOptions(argc, argv)
++#  define gGetUnicodeOptions(argc, argv) EXIT_SUCCESS
+ #endif
+ 
+ /**
+  *  Parse global command line options
+  */
+-void
++int
+ gParseOptions(gOptionsPtr ops, int *argc, char **argv)
+ {
+     int i, j;
+@@ -257,11 +257,11 @@ gParseOptions(gOptionsPtr ops, int *argc, char **argv)
+                 VERSION,
+                 LIBXML_DOTTED_VERSION, xmlParserVersion,
+                 LIBXSLT_DOTTED_VERSION, xsltEngineVersion);
+-            exit(EXIT_SUCCESS);
++            return EXIT_SUCCESS;
+         }
+         else if (!strcmp(argv[i], "--help"))
+         {
+-            usage(*argc, argv, EXIT_SUCCESS);
++            return usage(*argc, argv, EXIT_SUCCESS);
+         }
+         else if (argv[i][0] != '-')
+         {
+@@ -274,13 +274,14 @@ gParseOptions(gOptionsPtr ops, int *argc, char **argv)
+                     argv[j] = 0;
+             }
+             *argc -= i;
+-            return;
++            return EXIT_SUCCESS;
+         }
+         else
+         {
+-            usage(*argc, argv, EXIT_BAD_ARGS);
++            return usage(*argc, argv, EXIT_BAD_ARGS);
+         }
+     }
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+@@ -293,9 +294,14 @@ main(int argc, char **argv)
+ 
+     xmlMemSetup(free, xmalloc, xrealloc, xstrdup);
+ 
+-    gGetUnicodeOptions(argc, argv);
++    ret = gGetUnicodeOptions(argc, argv);
++    if (ret)
++        return ret;
++
+     gInitOptions(&globalOptions);
+-    gParseOptions(&globalOptions, &argc, argv);
++    ret = gParseOptions(&globalOptions, &argc, argv);
++    if (ret)
++        return ret;
+     
+     xmlSetStructuredErrorFunc(&errorInfo, reportError);
+     if (globalOptions.quiet)
+@@ -303,7 +309,7 @@ main(int argc, char **argv)
+ 
+     if (argc <= 1)
+     {
+-        usage(argc, argv, EXIT_BAD_ARGS);
++        ret = usage(argc, argv, EXIT_BAD_ARGS);
+     }
+     else if (!strcmp(argv[1], "ed") || !strcmp(argv[1], "edit"))
+     {
+@@ -355,10 +361,10 @@ main(int argc, char **argv)
+     }
+     else
+     {
+-        usage(argc, argv, EXIT_BAD_ARGS);
++        ret = usage(argc, argv, EXIT_BAD_ARGS);
+     }
+ 
+-    exit(ret);
++    return ret;
+ }
+ 
+ 
+@@ -401,7 +407,7 @@ registerXstarNs(xmlXPathContextPtr ctxt)
+ static void bad_ns_opt(const char *msg)
+ {
+     fprintf(stderr, "Bad namespace option: %s\n", msg);
+-    exit(EXIT_BAD_ARGS);
++    return;
+ }
+ 
+ const xmlChar *default_ns = NULL;
+@@ -432,11 +438,18 @@ parseNSArr(xmlChar** ns_arr, int* plen, int argc, char **argv)
+             continue;
+ 
+         i++;
+-        if (i >= argc) bad_ns_opt("-N without argument");
++        if (i >= argc)
++        {
++            bad_ns_opt("-N without argument");
++            return -EXIT_BAD_ARGS;
++        }
+ 
+         equal_sign = xmlStrchr((const xmlChar*) argv[i], '=');
+         if (!equal_sign)
++        {
+             bad_ns_opt("namespace should have the form <prefix>=<url>");
++            return -EXIT_BAD_ARGS;
++        }
+         prefix_len = equal_sign - (const xmlChar*) argv[i];
+ 
+         name = xmlStrndup((const xmlChar*) argv[i], prefix_len);
+@@ -445,7 +458,7 @@ parseNSArr(xmlChar** ns_arr, int* plen, int argc, char **argv)
+         if (*plen >= MAX_NS_ARGS)
+         {
+             fprintf(stderr, "too many namespaces increase MAX_NS_ARGS\n");
+-            exit(EXIT_BAD_ARGS);
++            return -EXIT_BAD_ARGS;
+         }
+ 
+         ns_arr[*plen] = name;
+@@ -453,10 +466,9 @@ parseNSArr(xmlChar** ns_arr, int* plen, int argc, char **argv)
+         ns_arr[*plen] = value;
+         (*plen)++;
+         ns_arr[*plen] = 0;
+-
+     }
+ 
+-    return i;
++    return 0;
+ }
+ 
+ /**
+diff --git a/xmlstarlet/src/xml_C14N.c b/xmlstarlet/src/xml_C14N.c
+index 4a0becc..2a6ccb5 100644
+--- a/xmlstarlet/src/xml_C14N.c
++++ b/xmlstarlet/src/xml_C14N.c
+@@ -29,14 +29,14 @@
+ 
+ #include "xmlstar.h"
+ 
+-static void c14nUsage(const char *name, exit_status status)
++static int c14nUsage(const char *name, exit_status status)
+ {
+     extern void fprint_c14n_usage(FILE* o, const char* argv0);
+     extern const char more_info[];
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_c14n_usage(o, name);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ static xmlXPathObjectPtr
+@@ -66,7 +66,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+         XML_PARSE_DTDATTR | (nonet? XML_PARSE_NONET:0));
+     if (doc == NULL) {
+         fprintf(stderr, "Error: unable to parse file \"%s\"\n", xml_filename);
+-        return(EXIT_BAD_FILE);
++        return EXIT_BAD_FILE;
+     }
+     
+     /*
+@@ -75,7 +75,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+     if(xmlDocGetRootElement(doc) == NULL) {
+         fprintf(stderr,"Error: empty document for file \"%s\"\n", xml_filename);
+         xmlFreeDoc(doc);
+-        return(EXIT_BAD_FILE);
++        return EXIT_BAD_FILE;
+     }
+ 
+     /* 
+@@ -86,7 +86,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+         if(xpath == NULL) {
+             fprintf(stderr,"Error: unable to evaluate xpath expression\n");
+             xmlFreeDoc(doc); 
+-            return(EXIT_BAD_FILE);
++            return EXIT_BAD_FILE;
+         }
+     }
+ 
+@@ -102,7 +102,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+         fprintf(stderr,"Error: failed to canonicalize XML file \"%s\" (ret=%d)\n",
+             xml_filename, ret);
+         xmlFreeDoc(doc);
+-        return(EXIT_FAILURE);
++        return EXIT_FAILURE;
+     }
+  
+     /*
+@@ -115,7 +115,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+ }
+ 
+ int c14nMain(int argc, char **argv) {
+-    int ret = -1, nonet = 1;
++    int ret = 0, nonet = 1;
+     
+     /*
+      * Init libxml
+@@ -138,9 +138,10 @@ int c14nMain(int argc, char **argv) {
+         if (argc >= 3)
+         {
+             if (strcmp(argv[2], "--help") == 0 || strcmp(argv[2], "-h") == 0)
+-                c14nUsage(argv[0], EXIT_SUCCESS);
++                ret = c14nUsage(argv[0], EXIT_SUCCESS);
+         }
+-        ret = run_c14n((argc > 2)? argv[2] : "-", 1, 0, NULL, NULL, nonet);
++        if (!ret)
++             ret = run_c14n((argc > 2)? argv[2] : "-", 1, 0, NULL, NULL, nonet);
+     } else if(strcmp(argv[2], "--with-comments") == 0) {
+         ret = run_c14n(argv[3], 1, 0, (argc > 4) ? argv[4] : NULL, NULL, nonet);
+     } else if(strcmp(argv[2], "--without-comments") == 0) {
+@@ -161,7 +162,7 @@ int c14nMain(int argc, char **argv) {
+         if(list != NULL) xmlFree(list);
+     } else {
+         fprintf(stderr, "error: bad arguments.\n");
+-        c14nUsage(argv[0], EXIT_BAD_ARGS);
++        ret = c14nUsage(argv[0], EXIT_BAD_ARGS);
+     }
+ 
+     /* 
+diff --git a/xmlstarlet/src/xml_depyx.c b/xmlstarlet/src/xml_depyx.c
+index 1935fc0..acb3b5e 100644
+--- a/xmlstarlet/src/xml_depyx.c
++++ b/xmlstarlet/src/xml_depyx.c
+@@ -37,7 +37,7 @@ THE SOFTWARE.
+ 
+ #define INSZ 4*1024
+ 
+-static void
++static int
+ depyxUsage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_depyx_usage(FILE* o, const char* argv0);
+@@ -45,7 +45,7 @@ depyxUsage(int argc, char **argv, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_depyx_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -112,7 +112,7 @@ pyxDePyx(char *file)
+        if (in == NULL)
+        {
+           fprintf(stderr, "error: could not open: %s\n", file);
+-          exit(EXIT_BAD_FILE);
++          return EXIT_BAD_FILE;
+        }
+    }
+    
+@@ -220,7 +220,7 @@ depyxMain(int argc, char **argv)
+ 
+    if ((argc >= 3) && (!strcmp(argv[2], "-h") || !strcmp(argv[2], "--help")))
+    {
+-       depyxUsage(argc, argv, EXIT_SUCCESS);
++       ret = depyxUsage(argc, argv, EXIT_SUCCESS);
+    }
+    else if (argc == 3)
+    {
+@@ -232,7 +232,7 @@ depyxMain(int argc, char **argv)
+    }
+    else
+    {
+-       depyxUsage(argc, argv, EXIT_BAD_ARGS);
++       ret = depyxUsage(argc, argv, EXIT_BAD_ARGS);
+    }
+    
+    printf("\n");
+diff --git a/xmlstarlet/src/xml_edit.c b/xmlstarlet/src/xml_edit.c
+index e199178..afd931b 100644
+--- a/xmlstarlet/src/xml_edit.c
++++ b/xmlstarlet/src/xml_edit.c
+@@ -124,7 +124,7 @@ typedef struct _XmlEdAction {
+ /**
+  *  display short help message
+  */
+-static void
++static int
+ edUsage(const char *argv0, exit_status status)
+ {
+     extern void fprint_edit_usage(FILE* o, const char* argv0);
+@@ -132,7 +132,7 @@ edUsage(const char *argv0, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_edit_usage(o, argv0);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -182,7 +182,7 @@ edParseOptions(edOptionsPtr ops, int argc, char **argv)
+         else if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h") ||
+                  !strcmp(argv[i], "-?") || !strcmp(argv[i], "-Z"))
+         {
+-            edUsage(argv[0], EXIT_SUCCESS);
++            return -edUsage(argv[0], EXIT_SUCCESS);
+         }
+         else
+         {
+@@ -242,7 +242,7 @@ update_string(xmlDocPtr doc, xmlNodePtr dest, const xmlChar* newstr)
+ /**
+  *  'update' operation
+  */
+-static void
++static int
+ edUpdate(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val,
+     XmlNodeType type, xmlXPathContextPtr ctxt)
+ {
+@@ -251,7 +251,7 @@ edUpdate(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val,
+ 
+     if (type == XML_EXPR) {
+         xpath = xmlXPathCompile((const xmlChar*) val);
+-        if (!xpath) return;
++        if (!xpath) return EXIT_FAILURE;
+     }
+ 
+     for (i = 0; i < nodes->nodeNr; i++)
+@@ -308,6 +308,7 @@ edUpdate(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val,
+     }
+ 
+     xmlXPathFreeCompExpr(xpath);
++    return EXIT_SUCCESS;
+ }
+ 
+ /* holds the node that was last inserted */
+@@ -326,7 +327,7 @@ removeNodeFromPrev(xmlNodePtr node)
+ /**
+  *  'insert' operation
+  */
+-static void
++static int
+ edInsert(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val, const char *name,
+          XmlNodeType type, int mode)
+ {
+@@ -340,7 +341,7 @@ edInsert(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val, const char *name,
+ 
+         if (nodes->nodeTab[i] == (void*) doc && mode != 0) {
+             fprintf(stderr, "The document node cannot have siblings.\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+ 
+         /* update node */
+@@ -370,12 +371,13 @@ edInsert(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val, const char *name,
+         }
+         xmlXPathNodeSetAdd(previous_insertion, node);
+     }
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+  *  'rename' operation
+  */
+-static void
++static int
+ edRename(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val, XmlNodeType type)
+ {
+     int i;
+@@ -383,16 +385,17 @@ edRename(xmlDocPtr doc, xmlNodeSetPtr nodes, const char *val, XmlNodeType type)
+     {
+         if (nodes->nodeTab[i] == (void*) doc) {
+             fprintf(stderr, "The document node cannot be renamed.\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+         xmlNodeSetName(nodes->nodeTab[i], BAD_CAST val);
+     }
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+  *  'delete' operation
+  */
+-static void
++static int
+ edDelete(xmlDocPtr doc, xmlNodeSetPtr nodes)
+ {
+     int i;
+@@ -400,12 +403,12 @@ edDelete(xmlDocPtr doc, xmlNodeSetPtr nodes)
+     {
+         if (nodes->nodeTab[i] == (void*) doc) {
+             fprintf(stderr, "The document node cannot be deleted.\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+ 
+         if (nodes->nodeTab[i]->type == XML_NAMESPACE_DECL) {
+             fprintf(stderr, "FIXME: can't delete namespace nodes\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+         /* delete node */
+         xmlUnlinkNode(nodes->nodeTab[i]);
+@@ -414,12 +417,13 @@ edDelete(xmlDocPtr doc, xmlNodeSetPtr nodes)
+         xmlFreeNode(nodes->nodeTab[i]);
+         nodes->nodeTab[i] = NULL;
+     }
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+  *  'move' operation
+  */
+-static void
++static int
+ edMove(xmlDocPtr doc, xmlNodeSetPtr nodes, xmlNodePtr to)
+ {
+     int i;
+@@ -427,25 +431,27 @@ edMove(xmlDocPtr doc, xmlNodeSetPtr nodes, xmlNodePtr to)
+     {
+         if (nodes->nodeTab[i] == (void*) doc) {
+             fprintf(stderr, "The document node cannot be moved.\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+ 
+         if (nodes->nodeTab[i]->type == XML_NAMESPACE_DECL) {
+             fprintf(stderr, "FIXME: can't move namespace nodes\n");
+-            exit(EXIT_INTERNAL_ERROR);
++            return EXIT_INTERNAL_ERROR;
+         }
+         /* move node */
+         xmlUnlinkNode(nodes->nodeTab[i]);
+         xmlAddChild(to, nodes->nodeTab[i]);
+     }
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+  *  Loop through array of operations and perform them
+  */
+-static void
++static int
+ edProcess(xmlDocPtr doc, const XmlEdAction* ops, int ops_count)
+ {
++    int ret = 0;
+     int k;
+     xmlXPathContextPtr ctxt = xmlXPathNewContext(doc);
+     /* NOTE: later registrations override earlier ones */
+@@ -492,7 +498,7 @@ edProcess(xmlDocPtr doc, const XmlEdAction* ops, int ops_count)
+         switch (ops[k].op)
+         {
+             case XML_ED_DELETE:
+-                edDelete(doc, nodes);
++                ret = edDelete(doc, nodes);
+                 break;
+             case XML_ED_MOVE: {
+                 xmlXPathObjectPtr res_to;
+@@ -504,41 +510,45 @@ edProcess(xmlDocPtr doc, const XmlEdAction* ops, int ops_count)
+                     fprintf(stderr, "move destination is not a single node\n");
+                     continue;
+                 }
+-                edMove(doc, nodes, res_to->nodesetval->nodeTab[0]);
++                ret = edMove(doc, nodes, res_to->nodesetval->nodeTab[0]);
+                 xmlXPathFreeObject(res_to);
+                 break;
+             }
+             case XML_ED_UPDATE:
+-                edUpdate(doc, nodes, ops[k].arg2, ops[k].type, ctxt);
++                ret = edUpdate(doc, nodes, ops[k].arg2, ops[k].type, ctxt);
+                 break;
+             case XML_ED_RENAME:
+-                edRename(doc, nodes, ops[k].arg2, ops[k].type);
++                ret = edRename(doc, nodes, ops[k].arg2, ops[k].type);
+                 break;
+             case XML_ED_INSERT:
+-                edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, -1);
++                ret = edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, -1);
+                 break;
+             case XML_ED_APPEND:
+-                edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, 1);
++                ret = edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, 1);
+                 break;
+             case XML_ED_SUBNODE:
+-                edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, 0);
++                ret = edInsert(doc, nodes, ops[k].arg2, ops[k].arg3, ops[k].type, 0);
+                 break;
+             default:
+                 break;
+         }
+         xmlXPathFreeObject(res);
++        if (ret)
++            break;
+     }
+     /* NOTE: free()ing ctxt also free()s previous_insertion */
+     previous_insertion = NULL;
+     xmlDeregisterNodeDefault(NULL);
+ 
+     xmlXPathFreeContext(ctxt);
++
++    return ret;
+ }
+ 
+ /**
+  *  Output document
+  */
+-static void
++static int
+ edOutput(const char* filename, const XmlEdAction* ops, int ops_count,
+     const edOptions* g_ops)
+ {
+@@ -559,7 +569,7 @@ edOutput(const char* filename, const XmlEdAction* ops, int ops_count,
+         cleanupNSArr(ns_arr);
+         xmlCleanupParser();
+         xmlCleanupGlobals();
+-        exit(EXIT_BAD_FILE);
++        return EXIT_BAD_FILE;
+     }
+ 
+     edProcess(doc, ops, ops_count);
+@@ -580,6 +590,8 @@ edOutput(const char* filename, const XmlEdAction* ops, int ops_count,
+     xmlSaveDoc(save, doc);
+     xmlSaveClose(save);
+     xmlFreeDoc(doc);
++
++    return EXIT_SUCCESS;
+ }
+ 
+ /**
+@@ -594,6 +606,7 @@ nextArg(char *const*const argv, int *argi)
+     if (arg == NULL)
+     {
+         edUsage(argv[0], EXIT_BAD_ARGS);
++        return NULL;
+     }
+     *argi += 1;
+     return arg;
+@@ -607,6 +620,8 @@ parseNextArg(char *const*const argv, int *argi,
+     const OptionSpec choices[], int choices_count)
+ {
+     const char* arg = nextArg(argv, argi);
++    if (arg == NULL)
++        return 0;
+     int i;
+     for (i = 0; i < choices_count; i++) {
+         if ((arg[0] == '-' && arg[1] == choices[i].shortOpt) ||
+@@ -648,18 +663,23 @@ parseInsertionArgs(XmlEdOp op_type, XmlEdAction* op,
+ int
+ edMain(int argc, char **argv)
+ {
++    int ret = 0;
+     int i, ops_count, max_ops_count = 8, n, start = 0;
+     XmlEdAction* ops = xmlMalloc(sizeof(XmlEdAction) * max_ops_count);
+     static edOptions g_ops;
+     int nCount = 0;
+ 
+-    if (argc < 3) edUsage(argv[0], EXIT_BAD_ARGS);
++    if (argc < 3) return edUsage(argv[0], EXIT_BAD_ARGS);
+ 
+     edInitOptions(&g_ops);
+     start = edParseOptions(&g_ops, argc, argv);
++    if (start < 0)
++        return -start;
++
++    ret = parseNSArr(ns_arr, &nCount, argc-start, argv+start);
++    if (ret < 0)
++        return -ret;
+ 
+-    parseNSArr(ns_arr, &nCount, argc-start, argv+start);
+-        
+     /*
+      *  Parse command line and fill array of operations
+      */
+@@ -669,6 +689,8 @@ edMain(int argc, char **argv)
+     while (i < argc)
+     {
+         const char *arg = nextArg(argv, &i);
++        if (arg == NULL)
++            break;
+         if (arg[0] == '-')
+         {
+             if (ops_count >= max_ops_count)
+@@ -741,17 +763,23 @@ edMain(int argc, char **argv)
+ 
+     if (i >= argc)
+     {
+-        edOutput("-", ops, ops_count, &g_ops);
++        ret = edOutput("-", ops, ops_count, &g_ops);
+     }
+-    
+-    for (n=i; n<argc; n++)
++
++    if (!ret)
+     {
+-        edOutput(argv[n], ops, ops_count, &g_ops);
++        for (n=i; n<argc; n++)
++        {
++            ret = edOutput(argv[n], ops, ops_count, &g_ops);
++            if (ret)
++                break;
++        }
+     }
+ 
+     xmlFree(ops);
+     cleanupNSArr(ns_arr);
+     xmlCleanupParser();
+     xmlCleanupGlobals();
+-    return 0;
++
++    return ret;
+ }
+diff --git a/xmlstarlet/src/xml_elem.c b/xmlstarlet/src/xml_elem.c
+index 024e62a..9ef60ae 100644
+--- a/xmlstarlet/src/xml_elem.c
++++ b/xmlstarlet/src/xml_elem.c
+@@ -62,7 +62,7 @@ static xmlChar *curXPath = NULL;
+ /**
+  *  Display usage syntax
+  */
+-void
++int
+ elUsage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_elem_usage(FILE* o, const char* argv0);
+@@ -70,7 +70,7 @@ elUsage(int argc, char **argv, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_elem_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -90,7 +90,7 @@ parse_xml_file(const char *filename)
+ 
+         if (!reader) {
+             fprintf(stderr, "couldn't read file '%s'\n", filename);
+-            exit(EXIT_BAD_FILE);
++            return EXIT_BAD_FILE;
+         }
+ 
+         ret = xmlTextReaderRead(reader);
+@@ -213,7 +213,7 @@ elMain(int argc, char **argv)
+     int errorno = 0;
+     char* inp_file = "-";
+ 
+-    if (argc <= 1) elUsage(argc, argv, EXIT_BAD_ARGS);
++    if (argc <= 1) return elUsage(argc, argv, EXIT_BAD_ARGS);
+ 
+     elInitOptions(&elOps);
+ 
+@@ -224,7 +224,7 @@ elMain(int argc, char **argv)
+         if (!strcmp(argv[2], "--help") || !strcmp(argv[2], "-h") ||
+             !strcmp(argv[2], "-?") || !strcmp(argv[2], "-Z"))
+         {
+-            elUsage(argc, argv, EXIT_SUCCESS);
++            return elUsage(argc, argv, EXIT_SUCCESS);
+         }
+         else if (!strcmp(argv[2], "-a"))
+         {
+@@ -259,7 +259,7 @@ elMain(int argc, char **argv)
+             errorno = parse_xml_file(argv[2]);
+         }
+         else
+-            elUsage(argc, argv, EXIT_BAD_ARGS);
++            return elUsage(argc, argv, EXIT_BAD_ARGS);
+     }
+ 
+     if (uniq)
+diff --git a/xmlstarlet/src/xml_escape.c b/xmlstarlet/src/xml_escape.c
+index 3e276df..0ec965f 100644
+--- a/xmlstarlet/src/xml_escape.c
++++ b/xmlstarlet/src/xml_escape.c
+@@ -46,7 +46,7 @@ THE SOFTWARE.
+ /**
+  *  Print small help for command line options
+  */
+-void
++int
+ escUsage(int argc, char **argv, int escape, exit_status status)
+ {
+     extern void fprint_escape_usage(FILE* o, const char* argv0);
+@@ -56,7 +56,7 @@ escUsage(int argc, char **argv, int escape, exit_status status)
+     if (escape) fprint_escape_usage(o, argv[0]);
+     else fprint_unescape_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /* "apos" or "quot" are biggest, add 1 for leading "&" */
+@@ -260,7 +260,7 @@ escMain(int argc, char **argv, int escape)
+     char* inp = NULL;
+     xmlChar* outBuf = NULL;
+     
+-    if (argc < 2) escUsage(argc, argv, escape, EXIT_BAD_ARGS);
++    if (argc < 2) return escUsage(argc, argv, escape, EXIT_BAD_ARGS);
+ 
+     inp = argv[2];
+ 
+@@ -268,7 +268,7 @@ escMain(int argc, char **argv, int escape)
+     {
+         if (!strcmp(argv[2], "--help") || !strcmp(argv[2], "-h") ||
+            !strcmp(argv[2], "-?") || !strcmp(argv[2], "-Z"))
+-            escUsage(argc, argv, escape, EXIT_SUCCESS);
++            return escUsage(argc, argv, escape, EXIT_SUCCESS);
+         if (!strcmp(argv[2], "-")) readStdIn = 1;
+     }
+     else
+diff --git a/xmlstarlet/src/xml_format.c b/xmlstarlet/src/xml_format.c
+index e9da4df..90dc836 100644
+--- a/xmlstarlet/src/xml_format.c
++++ b/xmlstarlet/src/xml_format.c
+@@ -72,7 +72,7 @@ static char *spaces = NULL;
+ /**
+  *  Print small help for command line options
+  */
+-void
++int
+ foUsage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_format_usage(FILE* o, const char* argv0);
+@@ -80,7 +80,7 @@ foUsage(int argc, char **argv, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_format_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -188,31 +188,31 @@ foParseOptions(foOptionsPtr ops, int argc, char **argv)
+         else if (!strcmp(argv[i], "--recover") || !strcmp(argv[i], "-R"))
+         {
+             ops->recovery = 1;
+-	    ops->options |= XML_PARSE_RECOVER;
++            ops->options |= XML_PARSE_RECOVER;
+             i++;
+         }
+         else if (!strcmp(argv[i], "--nocdata") || !strcmp(argv[i], "-C"))
+         {
+             ops->options |= XML_PARSE_NOCDATA;
+-	    i++;
++            i++;
+         }
+         else if (!strcmp(argv[i], "--nsclean") || !strcmp(argv[i], "-N"))
+         {
+             ops->options |= XML_PARSE_NSCLEAN;
+-	    i++;
++            i++;
+         }
+         else if (!strcmp(argv[i], "--indent-spaces") || !strcmp(argv[i], "-s"))
+         {
+             int value;
+             i++;
+-            if (i >= argc) foUsage(argc, argv, EXIT_BAD_ARGS);
++            if (i >= argc) return -foUsage(argc, argv, EXIT_BAD_ARGS);
+             if (sscanf(argv[i], "%d", &value) == 1)
+             {
+                 if (value > 0) ops->indent_spaces = value;
+             }
+             else
+             {
+-                foUsage(argc, argv, EXIT_BAD_ARGS);
++                return -foUsage(argc, argv, EXIT_BAD_ARGS);
+             }
+             ops->indent_tab = 0;
+             i++;
+@@ -236,7 +236,7 @@ foParseOptions(foOptionsPtr ops, int argc, char **argv)
+         }
+         else if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h"))
+         {
+-            foUsage(argc, argv, EXIT_SUCCESS);
++            return -foUsage(argc, argv, EXIT_SUCCESS);
+         }
+         else if (!strcmp(argv[i], "-"))
+         {
+@@ -245,7 +245,7 @@ foParseOptions(foOptionsPtr ops, int argc, char **argv)
+         }
+         else if (argv[i][0] == '-')
+         {
+-            foUsage(argc, argv, EXIT_BAD_ARGS);
++            return -foUsage(argc, argv, EXIT_BAD_ARGS);
+         }
+         else
+         {
+@@ -370,10 +370,12 @@ foMain(int argc, char **argv)
+     int start;
+     static foOptions ops;
+ 
+-    if (argc <=1) foUsage(argc, argv, EXIT_BAD_ARGS);
++    if (argc <=1) return foUsage(argc, argv, EXIT_BAD_ARGS);
+     foInitOptions(&ops);
+     start = foParseOptions(&ops, argc, argv);
+-    if (argc-start > 1) foUsage(argc, argv, EXIT_BAD_ARGS);
++    if (start < 0)
++        return -start;
++    if (argc-start > 1) return foUsage(argc, argv, EXIT_BAD_ARGS);
+     foInitLibXml(&ops);
+     ret = foProcess(&ops, start, argc, argv);
+     foCleanup();
+diff --git a/xmlstarlet/src/xml_ls.c b/xmlstarlet/src/xml_ls.c
+index c7341b9..25b7600 100644
+--- a/xmlstarlet/src/xml_ls.c
++++ b/xmlstarlet/src/xml_ls.c
+@@ -63,7 +63,7 @@ THE SOFTWARE.
+ /**
+  *  Print small help for command line options
+  */
+-void
++int
+ lsUsage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_ls_usage(FILE* o, const char* argv0);
+@@ -71,7 +71,7 @@ lsUsage(int argc, char **argv, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_ls_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ 
+@@ -189,11 +189,11 @@ lsMain(int argc, char** argv)
+ 
+     if (argc == 3) {
+         if (strcmp(argv[2], "--help") == 0)
+-            lsUsage(argc, argv, EXIT_SUCCESS);
++            return lsUsage(argc, argv, EXIT_SUCCESS);
+         else
+             dir = argv[2];
+     } else if (argc > 3) {
+-        lsUsage(argc, argv, EXIT_BAD_ARGS);
++        return lsUsage(argc, argv, EXIT_BAD_ARGS);
+     }
+ 
+     printf("<dir>\n");
+diff --git a/xmlstarlet/src/xml_pyx.c b/xmlstarlet/src/xml_pyx.c
+index ab295f1..47357b0 100644
+--- a/xmlstarlet/src/xml_pyx.c
++++ b/xmlstarlet/src/xml_pyx.c
+@@ -230,7 +230,7 @@ pyxCdataBlockHandler(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value, int len)
+     fprintf(stdout,"\n");
+ }
+ 
+-static void
++static int
+ pyxUsage(const char *argv0, exit_status status)
+ {
+     extern void fprint_pyx_usage(FILE* o, const char* argv0);
+@@ -238,7 +238,7 @@ pyxUsage(const char *argv0, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_pyx_usage(o, argv0);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ static xmlSAXHandler pyxSAX;
+@@ -276,7 +276,7 @@ pyxMain(int argc,const char *argv[])
+            (strcmp(argv[2],"--help") == 0)
+        ))
+     {
+-        pyxUsage(argv[0], EXIT_SUCCESS);
++        return pyxUsage(argv[0], EXIT_SUCCESS);
+     }
+ 
+     xmlInitParser();
+diff --git a/xmlstarlet/src/xml_select.c b/xmlstarlet/src/xml_select.c
+index 34ba20e..fec238d 100644
+--- a/xmlstarlet/src/xml_select.c
++++ b/xmlstarlet/src/xml_select.c
+@@ -154,7 +154,7 @@ caseSortFunction(xsltTransformContextPtr ctxt, xmlNodePtr *sorts,
+ /**
+  *  Print small help for command line options
+  */
+-void
++int
+ selUsage(const char *argv0, exit_status status)
+ {
+     extern void fprint_select_usage(FILE* out, const char* argv0);
+@@ -164,7 +164,7 @@ selUsage(const char *argv0, exit_status status)
+     fprint_select_usage(o, argv0);
+     fprintf(o, "%s", more_info);
+     fprintf(o, "%s", libxslt_more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -230,7 +230,7 @@ selParseOptions(selOptionsPtr ops, int argc, char **argv)
+                 if (argv[i + 1][0] == '-')
+                 {
+                     fprintf(stderr, "-E option requires argument <encoding> ex: (utf-8, unicode...)\n");
+-                    exit(EXIT_BAD_ARGS);
++                    return -EXIT_BAD_ARGS;
+                 }
+                 else
+                 {
+@@ -240,7 +240,7 @@ selParseOptions(selOptionsPtr ops, int argc, char **argv)
+             else
+             {
+                 fprintf(stderr, "-E option requires argument <encoding> ex: (utf-8, unicode...)\n");
+-                exit(EXIT_BAD_ARGS);
++                return -EXIT_BAD_ARGS;
+             }
+ 
+         }
+@@ -251,7 +251,7 @@ selParseOptions(selOptionsPtr ops, int argc, char **argv)
+         else if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h") ||
+                  !strcmp(argv[i], "-?") || !strcmp(argv[i], "-Z"))
+         {
+-            selUsage(argv[0], EXIT_SUCCESS);
++            return -selUsage(argv[0], EXIT_SUCCESS);
+         }
+         i++;
+     }
+@@ -335,7 +335,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+                     goto found_option; /* short option */
+             }
+             fprintf(stderr, "unrecognized option: %s\n", argv[i]);
+-            exit(EXIT_BAD_ARGS);
++            return -EXIT_BAD_ARGS;
+         }
+         else
+         {
+@@ -346,7 +346,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+         if (newtarg == &OPT_SORT && (targ != &OPT_MATCH && targ != &OPT_SORT))
+         {
+             fprintf(stderr, "sort(s) must follow match\n");
+-            exit(EXIT_BAD_ARGS);
++            return -EXIT_BAD_ARGS;
+         }
+         else if (newtarg == &OPT_TEMPLATE)
+         {
+@@ -364,7 +364,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+             node = node->parent;
+             if (node->_private != &OPT_IF) {
+                 fprintf(stderr, "else without if\n");
+-                exit(EXIT_BAD_ARGS);
++                return -EXIT_BAD_ARGS;
+             }
+         }
+         else if (newtarg == &OPT_VALUE_OF)
+@@ -387,7 +387,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+         for (j = 0; j < TEMPLATE_OPT_MAX_ARGS && newtarg->arguments[j].type; j++)
+         {
+             if (i >= argc && newtarg->arguments[j].type < TARG_NO_CMDLINE)
+-                selUsage(argv[0], EXIT_BAD_ARGS);
++                return -selUsage(argv[0], EXIT_BAD_ARGS);
+             switch (newtarg->arguments[j].type)
+             {
+             case TARG_VAR: {
+@@ -427,7 +427,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+                 char order, data_type, case_order;
+                 int nread;
+                 nread = sscanf(argv[i], "%c:%c:%c", &order, &data_type, &case_order);
+-                if (nread != 3) selUsage(argv[0], EXIT_BAD_ARGS); /* TODO: allow missing letters */
++                if (nread != 3) return -selUsage(argv[0], EXIT_BAD_ARGS); /* TODO: allow missing letters */
+ 
+                 if (order == 'A' || order == 'D')
+                     xmlNewProp(newnode, BAD_CAST "order",
+@@ -466,7 +466,7 @@ selGenTemplate(xmlNodePtr root, xmlNodePtr template_node,
+         fprintf(stderr, "error in arguments:");
+         fprintf(stderr, " -t or --template option must be followed by");
+         fprintf(stderr, " --match or other options\n");
+-        exit(EXIT_BAD_ARGS);
++        return -EXIT_BAD_ARGS;
+     }
+ 
+     if (!nextTempl)
+@@ -530,7 +530,7 @@ selPrepareXslt(xmlDocPtr style, selOptionsPtr ops, xmlChar *ns_arr[],
+     {
+         fprintf(stderr, "error in arguments:");
+         fprintf(stderr, " no -t or --template options found\n");
+-        exit(EXIT_BAD_ARGS);
++        return -EXIT_BAD_ARGS;
+     }
+ 
+     if (t > 1)
+@@ -563,8 +563,11 @@ selPrepareXslt(xmlDocPtr style, selOptionsPtr ops, xmlChar *ns_arr[],
+                 xslns, ops, &use_inputfile, &use_value_of,
+                 &lastTempl, i, argc, argv);
+             if (lastTempl) break;
++            if (i < 0) break;
+         }
+     }
++    if (i < 0)
++        return i;
+ 
+     if (!ops->outText && ops->printRoot) {
+         xmlNodePtr result_root = root_template;
+@@ -670,7 +673,12 @@ do_file(const char *filename, xmlDocPtr style_tree,
+                 extract_ns_defs(xmlDocGetRootElement(doc), style_tree);
+             /* Parse XSLT stylesheet */
+             style = xsltParseStylesheetDoc(style_tree);
+-            if (!style) exit(EXIT_LIB_ERROR);
++            if (!style)
++            {
++                *status = EXIT_LIB_ERROR;
++                xmlFree(value);
++                return;
++            }
+         }
+ 
+         res = xsltTransform(xsltOps, doc, params, style, filename);
+@@ -703,11 +711,16 @@ selMain(int argc, char **argv)
+     xmlDocPtr style_tree;
+     int xml_options = 0;
+ 
+-    if (argc <= 2) selUsage(argv[0], EXIT_BAD_ARGS);
++    if (argc <= 2) return selUsage(argv[0], EXIT_BAD_ARGS);
+ 
+     selInitOptions(&ops);
+     xsltInitOptions(&xsltOps);
+     start = selParseOptions(&ops, argc, argv);
++    if (start < 0)
++    {
++        status = -start;
++        goto cleanup;
++    }
+     xml_options |= XML_PARSE_NOENT; /* substitute entities */
+     xml_options |= XML_PARSE_DTDATTR; /* use default attrib values */
+     xml_options |= ops.nonet? XML_PARSE_NONET : 0;
+@@ -717,10 +730,20 @@ selMain(int argc, char **argv)
+     xsltSetSortFunc(caseSortFunction);
+ 
+     /* set parameters */
+-    parseNSArr(ns_arr, &nCount, start, argv+2);
++    status = parseNSArr(ns_arr, &nCount, start, argv+2);
++    if (status < 0)
++    {
++        status = -status;
++        goto cleanup;
++    }
+ 
+     style_tree = xmlNewDoc(NULL);
+     i = selPrepareXslt(style_tree, &ops, ns_arr, start, argc, argv);
++    if (i < 0)
++    {
++        status = -i;
++        goto cleanup;
++    }
+ 
+     if (ops.printXSLT)
+     {
+@@ -731,7 +754,8 @@ selMain(int argc, char **argv)
+             xmlTextReaderClose(reader);
+         }
+         xmlDocFormatDump(stdout, style_tree, 1);
+-        exit(EXIT_SUCCESS);
++        status = EXIT_SUCCESS;
++        goto cleanup;
+     }
+ 
+     for (n=i; n<argc; n++)
+@@ -740,6 +764,7 @@ selMain(int argc, char **argv)
+     if (i == argc)
+         do_file("-", style_tree, xml_options, &ops, &xsltOps, &status);
+ 
++    cleanup:
+     /* 
+      * Shutdown libxml
+      */
+diff --git a/xmlstarlet/src/xml_trans.c b/xmlstarlet/src/xml_trans.c
+index b5f8355..87f9298 100644
+--- a/xmlstarlet/src/xml_trans.c
++++ b/xmlstarlet/src/xml_trans.c
+@@ -46,7 +46,7 @@ THE SOFTWARE.
+ /**
+  *  Display usage syntax
+  */
+-void
++int
+ trUsage(const char *argv0, exit_status status)
+ {
+     extern void fprint_trans_usage(FILE* o, const char* argv0);
+@@ -56,7 +56,7 @@ trUsage(const char *argv0, exit_status status)
+     fprint_trans_usage(o, argv0);
+     fprintf(o, "%s", more_info);
+     fprintf(o, "%s", libxslt_more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -74,7 +74,7 @@ trParseOptions(xsltOptionsPtr ops, int argc, char **argv)
+         {
+             if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h"))
+             {
+-                trUsage(argv[0], EXIT_SUCCESS);
++                return -trUsage(argv[0], EXIT_SUCCESS);
+             }
+             else if (!strcmp(argv[i], "--show-ext"))
+             {
+@@ -158,10 +158,10 @@ trParseParams(const char** params, int* plen,
+                 xmlChar *name, *value;
+                 
+                 i++;
+-                if (i >= count) trUsage(argv[0], EXIT_BAD_ARGS);
++                if (i >= count) return -trUsage(argv[0], EXIT_BAD_ARGS);
+ 
+                 for(j=0; argv[i][j] && (argv[i][j] != '='); j++);
+-                if (argv[i][j] != '=') trUsage(argv[0], EXIT_BAD_ARGS);
++                if (argv[i][j] != '=') return -trUsage(argv[0], EXIT_BAD_ARGS);
+                 
+                 name = xmlStrndup((const xmlChar *) argv[i], j);
+                 value = xmlStrdup((const xmlChar *) argv[i]+j+1);
+@@ -169,7 +169,7 @@ trParseParams(const char** params, int* plen,
+                 if (*plen >= MAX_PARAMETERS)
+                 {
+                     fprintf(stderr, "too many params increase MAX_PARAMETERS\n");
+-                    exit(EXIT_INTERNAL_ERROR);
++                    return -EXIT_INTERNAL_ERROR;
+                 }
+ 
+                 params[*plen] = (char *)name;
+@@ -185,10 +185,10 @@ trParseParams(const char** params, int* plen,
+                 xmlChar *name, *value;
+ 
+                 i++;
+-                if (i >= count) trUsage(argv[0], EXIT_BAD_ARGS);
++                if (i >= count) return -trUsage(argv[0], EXIT_BAD_ARGS);
+ 
+                 for(j=0; argv[i][j] && (argv[i][j] != '='); j++);
+-                if (argv[i][j] != '=') trUsage(argv[0], EXIT_BAD_ARGS);
++                if (argv[i][j] != '=') return -trUsage(argv[0], EXIT_BAD_ARGS);
+ 
+                 name = xmlStrndup((const xmlChar *)argv[i], j);
+                 string = (const xmlChar *)(argv[i]+j+1);
+@@ -199,7 +199,7 @@ trParseParams(const char** params, int* plen,
+                     {
+                         fprintf(stderr,
+                             "string parameter contains both quote and double-quotes\n");
+-                        exit(EXIT_INTERNAL_ERROR);
++                        return -EXIT_INTERNAL_ERROR;
+                     }
+                     value = xmlStrdup((const xmlChar *)"'");
+                     value = xmlStrcat(value, string);
+@@ -215,7 +215,7 @@ trParseParams(const char** params, int* plen,
+                 if (*plen >= MAX_PARAMETERS)
+                 {
+                     fprintf(stderr, "too many params increase MAX_PARAMETERS\n");
+-                    exit(EXIT_INTERNAL_ERROR);
++                    return -EXIT_INTERNAL_ERROR;
+                 }
+ 
+                 params[*plen] = (char *)name;
+@@ -257,22 +257,28 @@ trMain(int argc, char **argv)
+     static const char *xsltParams[2 * MAX_PARAMETERS + 1];
+ 
+     int errorno = 0;
+-    int start, xslt_ind;
++    int start, xslt_ind, next;
+     int pCount;
+     
+-    if (argc <= 2) trUsage(argv[0], EXIT_BAD_ARGS);
++    if (argc <= 2) return trUsage(argv[0], EXIT_BAD_ARGS);
+ 
+     xsltInitOptions(&ops);
+     start = trParseOptions(&ops, argc, argv);
++    if (start < 0)
++        return -start;
+     xslt_ind = start;
+     xsltInitLibXml(&ops);
+ 
+     /* set parameters */
+-    start += trParseParams(xsltParams, &pCount, argc-start-1, argv+start+1);
+-    
+-    /* run transformation */
+-    errorno = xsltRun(&ops, argv[xslt_ind], xsltParams,
+-                      argc-start-1, argv+start+1);
++    next = trParseParams(xsltParams, &pCount, argc-start-1, argv+start+1);
++    if (next >= 0)
++    {
++        start += next;
++
++        /* run transformation */
++        errorno = xsltRun(&ops, argv[xslt_ind], xsltParams,
++                          argc-start-1, argv+start+1);
++    }
+ 
+     /* free resources */
+     trCleanupParams(xsltParams);
+diff --git a/xmlstarlet/src/xml_validate.c b/xmlstarlet/src/xml_validate.c
+index 6fe5584..14ec7d5 100644
+--- a/xmlstarlet/src/xml_validate.c
++++ b/xmlstarlet/src/xml_validate.c
+@@ -71,7 +71,7 @@ typedef valOptions *valOptionsPtr;
+ /**
+  *  display short help message
+  */
+-void
++int
+ valUsage(int argc, char **argv, exit_status status)
+ {
+     extern void fprint_validate_usage(FILE* o, const char* argv0);
+@@ -79,7 +79,7 @@ valUsage(int argc, char **argv, exit_status status)
+     FILE *o = (status == EXIT_SUCCESS)? stdout : stderr;
+     fprint_validate_usage(o, argv[0]);
+     fprintf(o, "%s", more_info);
+-    exit(status);
++    return status;
+ }
+ 
+ /**
+@@ -158,21 +158,21 @@ valParseOptions(valOptionsPtr ops, int argc, char **argv)
+         else if (!strcmp(argv[i], "--dtd") || !strcmp(argv[i], "-d"))
+         {
+             i++;
+-            if (i >= argc) valUsage(argc, argv, EXIT_BAD_ARGS);
++            if (i >= argc) return -valUsage(argc, argv, EXIT_BAD_ARGS);
+             ops->dtd = argv[i];
+             i++;
+         }
+         else if (!strcmp(argv[i], "--xsd") || !strcmp(argv[i], "-s"))
+         {
+             i++;
+-            if (i >= argc) valUsage(argc, argv, EXIT_BAD_ARGS);
++            if (i >= argc) return -valUsage(argc, argv, EXIT_BAD_ARGS);
+             ops->schema = argv[i];
+             i++;
+         }
+         else if (!strcmp(argv[i], "--relaxng") || !strcmp(argv[i], "-r"))
+         {
+             i++;
+-            if (i >= argc) valUsage(argc, argv, EXIT_BAD_ARGS);
++            if (i >= argc) return -valUsage(argc, argv, EXIT_BAD_ARGS);
+             ops->relaxng = argv[i];
+             i++;
+         }
+@@ -183,7 +183,7 @@ valParseOptions(valOptionsPtr ops, int argc, char **argv)
+         }
+         else if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h"))
+         {
+-            valUsage(argc, argv, EXIT_SUCCESS);
++            return -valUsage(argc, argv, EXIT_SUCCESS);
+         }
+         else if (!strcmp(argv[i], "-"))
+         {
+@@ -192,7 +192,7 @@ valParseOptions(valOptionsPtr ops, int argc, char **argv)
+         }
+         else if (argv[i][0] == '-')
+         {
+-            valUsage(argc, argv, EXIT_BAD_ARGS);
++            return -valUsage(argc, argv, EXIT_BAD_ARGS);
+         }
+         else
+         {
+@@ -236,7 +236,7 @@ valAgainstDtd(valOptionsPtr ops, char* dtdvalid, xmlDocPtr doc, char* filename)
+             {
+                 xmlGenericError(xmlGenericErrorContext,
+                     "Couldn't allocate validation context\n");
+-                exit(-1);
++                return -1;
+             }
+         
+             if (ops->err)
+@@ -291,9 +291,11 @@ valMain(int argc, char **argv)
+     int invalidFound = 0;
+     int options = XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR;
+ 
+-    if (argc <= 2) valUsage(argc, argv, EXIT_BAD_ARGS);
++    if (argc <= 2) return valUsage(argc, argv, EXIT_BAD_ARGS);
+     valInitOptions(&ops);
+     start = valParseOptions(&ops, argc, argv);
++    if (start < 0)
++        return -start;
+     if (ops.nonet) options |= XML_PARSE_NONET;
+ 
+     errorInfo.verbose = ops.err;
