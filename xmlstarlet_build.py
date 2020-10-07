@@ -16,7 +16,7 @@ print(subprocess.getoutput("git checkout -- ./xmlstarlet/ || true"))
 # Make sure all cases where stdlib.h exit() is called are replaced with
 # returns as appropriate, otherwise any calls with non-zero exit code
 # will terminate the interpreter!
-print(subprocess.getoutput("patch -p2 < ./xmlstarlet/no-exit.patch || true"))
+print(subprocess.getoutput("patch -p1 < ./xmlstarlet/no-exit.patch || true"))
 
 if os.name != "nt":
     HAVE_CONFIG = os.path.exists(os.path.join(SOURCE_DIR, "config.h"))
