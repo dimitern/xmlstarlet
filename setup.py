@@ -19,7 +19,7 @@ setup_requirements = ["pytest-runner", "setuptools", "wheel", "cffi>=1.0.0"]
 if sys.version_info[:2] in ((3, 7), (3, 6)):
     setup_requirements += ["pickle5"]
 
-test_requirements = ["pytest"]
+test_requirements = ["pytest", "pytest-randomly", "pytest-xdist", "pytest-cov"]
 
 setup(
     author="Mikhail Grushinskiy",

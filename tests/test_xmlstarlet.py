@@ -4,8 +4,9 @@
 
 import os
 
-import pytest
 import py
+import pytest
+
 import xmlstarlet
 
 

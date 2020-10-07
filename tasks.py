@@ -44,9 +44,7 @@ def _delete_file(file):
             pass
 
 
-@task(
-    help={"wheel": "Build a binary wheel in addition to source package",}
-)
+@task(help={"wheel": "Build a binary wheel in addition to source package"})
 def dist(c, wheel=False):
     """
     Build source and (optionally) a binary wheel packages, optionally installing it.
@@ -93,20 +91,19 @@ def test(c):
     help={
         "publish": "Publish the result via coveralls (not working)",
         "browser": "Open the local HTML coverage report in the default browser",
-    }
+    },
 )
 def coverage(c, publish=False, browser=False):
     """
     Create coverage report
     """
-    c.run("coverage run --source {} -m pytest".format(SOURCE_DIR))
-    c.run("coverage report")
+
+    # Build a local report
+    c.run("pytest --cov-report=html")
     if publish:
         # Publish the results via coveralls
         c.run("coveralls")
 
-    # Build a local report
-    c.run("coverage html")
     if browser:
         webbrowser.open(COVERAGE_REPORT.as_uri())
 
