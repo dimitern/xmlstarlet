@@ -13,6 +13,10 @@ C_SOURCE_DIR = os.path.join(SOURCE_DIR, "src")
 
 # Ensure the git source directory is not dirty (e.g. when developing locally)
 print(subprocess.getoutput("git checkout -- ./xmlstarlet/ || true"))
+# Make sure all cases where stdlib.h exit() is called are replaced with
+# returns as appropriate, otherwise any calls with non-zero exit code
+# will terminate the interpreter!
+print(subprocess.getoutput("patch -p1 < ./xmlstarlet/no-exit.patch || true"))
 
 if os.name != "nt":
     HAVE_CONFIG = os.path.exists(os.path.join(SOURCE_DIR, "config.h"))
@@ -69,7 +73,7 @@ if os.name != "nt":
         print("Running `./configure` to create a Makefile...")
         exit_code, output = subprocess.getstatusoutput(
             "cd ./xmlstarlet/ && ./configure --prefix={0} --includedir={1} && cd  ..".format(
-                os.environ["CONFIG_PREFIX"], os.environ["INCLUDE_PATH"],
+                os.environ["CONFIG_PREFIX"], os.environ["INCLUDE_PATH"]
             )
         )
 
@@ -106,14 +110,7 @@ else:
         os.path.join(os.environ["PREFIX"], "include", "libxml2"),
     ]
     LIBRARY_DIRS = [os.path.join(os.environ["PREFIX"], "lib")]
-    LIBRARIES = [
-        "libxml2_a",
-        "libxslt_a",
-        "libexslt_a",
-        "wsock32",
-        "ws2_32",
-        "shell32",
-    ]
+    LIBRARIES = ["libxml2_a", "libxslt_a", "libexslt_a", "wsock32", "ws2_32", "shell32"]
     if os.environ.get("Platform", "") == "x86":
         LIBRARIES += ["vcruntime"]
 
