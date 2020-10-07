@@ -86,7 +86,7 @@ def test(c):
     Run tests
     """
     pty = platform.system() == "Linux"
-    c.run("pytest -n 1 -s", pty=pty)
+    c.run("pytest", pty=pty)
 
 
 @task(
