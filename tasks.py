@@ -45,9 +45,7 @@ def _delete_file(file):
 
 
 @task(
-    help={
-        "wheel": "Build a binary wheel in addition to source package",
-    }
+    help={"wheel": "Build a binary wheel in addition to source package",}
 )
 def dist(c, wheel=False):
     """
@@ -88,7 +86,7 @@ def test(c):
     Run tests
     """
     pty = platform.system() == "Linux"
-    c.run("python {} test".format(SETUP_FILE), pty=pty)
+    c.run("pytest -n 1 -s", pty=pty)
 
 
 @task(
