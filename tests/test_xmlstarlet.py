@@ -70,12 +70,11 @@ def test_edit(captured_fd):
                         </h:a>
                 </h:p>
         </h:body>
-</h:html>
-"""
+</h:html>"""
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_element(captured_fd):
@@ -84,12 +83,11 @@ def test_element(captured_fd):
     expected = """h:html
 h:html/h:body
 h:html/h:body/h:p
-h:html/h:body/h:p/h:a
-"""
+h:html/h:body/h:p/h:a"""
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_escape(captured_fd):
@@ -98,7 +96,7 @@ def test_escape(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == "&lt;xml/&gt;\n"
+    assert out.strip() == "&lt;xml/&gt;"
 
 
 def test_unescape(captured_fd):
@@ -107,7 +105,7 @@ def test_unescape(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == "<xml/>"
+    assert out.strip() == "<xml/>"
 
 
 def test_canonicalize(captured_fd):
@@ -125,7 +123,7 @@ def test_canonicalize(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_pyx(captured_fd):
@@ -149,10 +147,9 @@ def test_depyx(captured_fd):
                         </h:a>
                 </h:p>
         </h:body>
-</h:html>
-"""
+</h:html>"""
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_select(captured_fd):
@@ -175,12 +172,11 @@ def test_format(captured_fd):
                         </h:a>
     </h:p>
   </h:body>
-</h:html>
-"""
+</h:html>"""
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_listdir(captured_fd):
@@ -221,4 +217,4 @@ def test_validate(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == "test.xml - valid\n"
+    assert out.strip() == "test.xml - valid"
