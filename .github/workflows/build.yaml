@@ -87,7 +87,9 @@ jobs:
         run: |
           sudo apt-get install -yqq libxslt1-dev libxml2-dev
           python -m pip --disable-pip-version-check install -r requirements.txt
-          invoke dist --wheel test coverage
+          invoke dist --wheel
+          pip install --force-reinstall ./dist/xmlstarlet-*.whl
+          pytest
 
       - uses: actions/upload-artifact@v2
         with:
