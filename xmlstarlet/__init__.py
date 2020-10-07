@@ -23,7 +23,7 @@ Each of these functions takes string arguments and returns the integer exit code
 (0 = success, otherwise an error occured).
 """
 
-import xmlstarlet._xmlstarlet
+import xmlstarlet._xmlstarlet  # nocov
 
 _ffi = xmlstarlet._xmlstarlet.ffi  # pylint: disable=protected-access
 _lib = xmlstarlet._xmlstarlet.lib  # pylint: disable=protected-access
