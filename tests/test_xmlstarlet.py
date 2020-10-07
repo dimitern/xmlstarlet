@@ -119,11 +119,13 @@ def test_canonicalize(captured_fd):
                         </h:a>
                 </h:p>
         </h:body>
-</h:html>"""
+</h:html>""".splitlines()
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out.strip() == expected.strip()
+    out = "".join(map(str.strip, out.splitlines())).strip()
+    expected = "".join(map(str.strip, expected)).strip()
+    assert out == expected
 
 
 def test_pyx(captured_fd):
