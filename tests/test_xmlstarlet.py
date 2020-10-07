@@ -160,7 +160,7 @@ def test_select(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == "test.xml\n"
+    assert out.strip() == "test.xml"
 
 
 def test_format(captured_fd):
@@ -213,7 +213,7 @@ def test_transform(captured_fd):
 
     out, err = captured_fd.reset()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_validate(captured_fd):
