@@ -10,7 +10,7 @@ env:
   CIBW_SKIP: "cp27-* cp35-* pp*"
   CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel"
   CIBW_BEFORE_BUILD_MACOS: "brew install automake"
-  CIBW_TEST_REQUIRES: pytest
+  CIBW_TEST_REQUIRES: pytest pytest-randomly pytest-xdist pytest-coverage
   CIBW_TEST_COMMAND: "pytest {project}"
   
 jobs:
