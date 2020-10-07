@@ -132,7 +132,7 @@ def test_pyx(captured_fd):
     out, err = captured_fd.reset()
     expected = open("./test.pyx", "r").read()
     assert err == ""
-    assert out == expected
+    assert out.strip() == expected.strip()
 
 
 def test_depyx(captured_fd):
