@@ -14,10 +14,6 @@ XMLStarlet CFFI
      :target: https://xmlstarlet.readthedocs.io/en/latest/?badge=latest
      :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/dimitern/xmlstarlet/shield.svg
-     :target: https://pyup.io/repos/github/dimitern/xmlstarlet/
-     :alt: Updates
-
 
 XMLStarlet Toolkit: Python CFFI bindings
 
@@ -55,10 +51,8 @@ This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypack
 
 Binary wheels built via GitHub Actions by cibuildwheel_
 
-Development `requirements.txt` dependencies scanned by PyUp.io_
-
 .. _SourceForge: https://sourceforge.net/projects/xmlstar/
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 .. _cibuildwheel: https://github.com/joerick/cibuildwheel
-.. _PyUp.io: https://pyup.io
+
