@@ -12,6 +12,7 @@ env:
   CIBW_BEFORE_BUILD_MACOS: "brew install automake"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: "pytest {project}"
+  MACOSX_DEPLOYMENT_TARGET: "10.15"
   
 jobs:
   build_wheels:
