@@ -89,6 +89,7 @@ jobs:
       - name: Build sdist and run tests
         run: |
           sudo apt-get install -yqq libxslt1-dev libxml2-dev
+          python -m pip install --upgrade pip setuptools wheel
           python -m pip --disable-pip-version-check install -r requirements.txt
           invoke test coverage
 
