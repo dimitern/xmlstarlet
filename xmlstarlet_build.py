@@ -100,7 +100,7 @@ else:
         os.path.relpath(s, ROOT_DIR)
         for s in glob(os.path.join(C_SOURCE_DIR, "**"), recursive=True)
         if s.endswith(".c")
-        and "_xmlstarlet" not in s
+        # and "_xmlstarlet" not in s
         and ("win32_xml_ls.c" in s or "xml_ls.c" not in s)
     ]
     INCLUDE_DIRS = [
