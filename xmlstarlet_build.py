@@ -130,23 +130,6 @@ print("-" * 40)
 
 FFIBUILDER = FFI()
 
-# set_source() gives the name of the python extension module to
-# produce, and some C source code as a string.  This C code needs
-# to make the declarated functions, types and globals available,
-# so it is often just the "#include".
-FFIBUILDER.set_source(
-    "xmlstarlet._xmlstarlet",
-    """
-#include <libxml/xmlversion.h>
-#include <xmlstar.h>
-#include <config.h>
-#include <libexslt/exslt.h>
-""",
-    sources=sources,
-    include_dirs=include_dirs,
-    libraries=libraries,
-    library_dirs=library_dirs,
-)
 
 # cdef() expects a single string declaring the C types, functions and
 # globals needed to use the shared object. It must be in valid C syntax.
@@ -164,6 +147,24 @@ int selMain(int argc, char **argv);
 int trMain(int argc, char **argv);
 int valMain(int argc, char **argv);
 """
+)
+
+# set_source() gives the name of the python extension module to
+# produce, and some C source code as a string.  This C code needs
+# to make the declarated functions, types and globals available,
+# so it is often just the "#include".
+FFIBUILDER.set_source(
+    "xmlstarlet._xmlstarlet",
+    """
+#include <libxml/xmlversion.h>
+#include <xmlstar.h>
+#include <config.h>
+#include <libexslt/exslt.h>
+""",
+    sources=sources,
+    include_dirs=include_dirs,
+    libraries=libraries,
+    library_dirs=library_dirs,
 )
 
 
