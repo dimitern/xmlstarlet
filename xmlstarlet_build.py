@@ -152,20 +152,24 @@ FFIBUILDER.set_source(
 # globals needed to use the shared object. It must be in valid C syntax.
 FFIBUILDER.cdef(
     """
-extern int c14nMain(int argc, char **argv);
-extern int depyxMain(int argc, char **argv);
-extern int edMain(int argc, char **argv);
-extern int elMain(int argc, char **argv);
-extern int escMain(int argc, char **argv, int escape);
-extern int foMain(int argc, char **argv);
-extern int lsMain(int argc, char **argv);
-extern int pyxMain(int argc, char **argv);
-extern int selMain(int argc, char **argv);
-extern int trMain(int argc, char **argv);
-extern int valMain(int argc, char **argv);
+int c14nMain(int argc, char **argv);
+int depyxMain(int argc, char **argv);
+int edMain(int argc, char **argv);
+int elMain(int argc, char **argv);
+int escMain(int argc, char **argv, int escape);
+int foMain(int argc, char **argv);
+int lsMain(int argc, char **argv);
+int pyxMain(int argc, char **argv);
+int selMain(int argc, char **argv);
+int trMain(int argc, char **argv);
+int valMain(int argc, char **argv);
 """
 )
 
 
 if __name__ == "__main__":
+    FFIBUILDER.emit_c_code("gen_xmlstarlet.c")
+    with open("gen_xmlstarlet.c", "rt", encoding="utf-8") as f:
+        print(f.read(), flush=True)
+        
     FFIBUILDER.compile(verbose=True)
