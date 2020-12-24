@@ -130,25 +130,6 @@ print("-" * 40)
 
 FFIBUILDER = FFI()
 
-
-# cdef() expects a single string declaring the C types, functions and
-# globals needed to use the shared object. It must be in valid C syntax.
-FFIBUILDER.cdef(
-    """
-int c14nMain(int argc, char **argv);
-int depyxMain(int argc, char **argv);
-int edMain(int argc, char **argv);
-int elMain(int argc, char **argv);
-int escMain(int argc, char **argv, int escape);
-int foMain(int argc, char **argv);
-int lsMain(int argc, char **argv);
-int pyxMain(int argc, char **argv);
-int selMain(int argc, char **argv);
-int trMain(int argc, char **argv);
-int valMain(int argc, char **argv);
-"""
-)
-
 # set_source() gives the name of the python extension module to
 # produce, and some C source code as a string.  This C code needs
 # to make the declarated functions, types and globals available,
@@ -165,6 +146,24 @@ FFIBUILDER.set_source(
     include_dirs=include_dirs,
     libraries=libraries,
     library_dirs=library_dirs,
+)
+
+# cdef() expects a single string declaring the C types, functions and
+# globals needed to use the shared object. It must be in valid C syntax.
+FFIBUILDER.cdef(
+    """
+extern int c14nMain(int argc, char **argv);
+extern int depyxMain(int argc, char **argv);
+extern int edMain(int argc, char **argv);
+extern int elMain(int argc, char **argv);
+extern int escMain(int argc, char **argv, int escape);
+extern int foMain(int argc, char **argv);
+extern int lsMain(int argc, char **argv);
+extern int pyxMain(int argc, char **argv);
+extern int selMain(int argc, char **argv);
+extern int trMain(int argc, char **argv);
+extern int valMain(int argc, char **argv);
+"""
 )
 
 
