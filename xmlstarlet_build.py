@@ -46,6 +46,7 @@ if os.name != "nt":
     EXTRA_CFLAGS = (
         subprocess.getoutput("xml2-config --cflags").split()
         + subprocess.getoutput("xslt-config --cflags").split()
+        + ["-Wno-error=implicit-function-declaration"]  # needed to build on macos-10.15 for some reason
     )
 
     EXTRA_LDFLAGS = (
