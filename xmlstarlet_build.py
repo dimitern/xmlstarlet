@@ -166,10 +166,10 @@ int valMain(int argc, char **argv);
 """
 )
 
-
-if __name__ == "__main__":
-    FFIBUILDER.emit_c_code("gen_xmlstarlet.c")
+FFIBUILDER.emit_c_code("gen_xmlstarlet.c")
     with open("gen_xmlstarlet.c", "rt", encoding="utf-8") as f:
         print(f.read(), flush=True)
         
+
+if __name__ == "__main__":
     FFIBUILDER.compile(verbose=True)
