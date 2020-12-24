@@ -46,6 +46,7 @@ if os.name != "nt":
     EXTRA_CFLAGS = (
         subprocess.getoutput("xml2-config --cflags").split()
         + subprocess.getoutput("xslt-config --cflags").split()
+        + ["-Wno-error=implicit-function-declaration"]
     )
 
     EXTRA_LDFLAGS = (
@@ -167,8 +168,8 @@ int valMain(int argc, char **argv);
 )
 
 FFIBUILDER.emit_c_code("gen_xmlstarlet.c")
-    with open("gen_xmlstarlet.c", "rt", encoding="utf-8") as f:
-        print(f.read(), flush=True)
+with open("gen_xmlstarlet.c", "rt", encoding="utf-8") as f:
+    print(f.read(), flush=True)
         
 
 if __name__ == "__main__":
