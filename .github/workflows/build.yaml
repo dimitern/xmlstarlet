@@ -14,6 +14,7 @@ env:
   CIBW_TEST_COMMAND: "pytest {project}"
   MACOSX_DEPLOYMENT_TARGET: "10.15"
   CIBW_DEPENDENCY_VERSIONS: "latest"
+  CIBW_BUILD_VERBOSITY: 3
 
 jobs:
   build_wheels:
