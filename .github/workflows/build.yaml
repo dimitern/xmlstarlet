@@ -71,7 +71,7 @@ jobs:
           python -m pip --disable-pip-version-check install cibuildwheel==1.7.2
           python -m cibuildwheel --output-dir wheelhouse
         
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
 
@@ -94,7 +94,7 @@ jobs:
           python -m pip --disable-pip-version-check install -r requirements_dev.txt
           invoke test coverage
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: dist/*.tar.gz
 
