@@ -89,7 +89,14 @@ html_theme = "alabaster"
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "github_user": "dimitern",
+    "github_repo": "xmlstarlet",
+    "github_banner": "true",
+    "github_button": "true",
+    "page_width": "60%",
+    "body_max_width": "none",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
