@@ -59,6 +59,9 @@ jobs:
     #    uses a compiled language
 
     - run: |
+       sudo apt-get install -yqq libxslt1-dev libxml2-dev
+       python3 -m pip install --upgrade pip setuptools wheel
+       python3 -m pip install -r requirements.txt
        python3 setup.py sdist bdist_wheel
 
     - name: Perform CodeQL Analysis
