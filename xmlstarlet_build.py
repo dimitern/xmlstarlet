@@ -75,10 +75,11 @@ if os.name != "nt":
 
     if not (HAVE_CONFIG or HAVE_MAKEFILE) and HAVE_CONFIGURE:
         print("Running `./configure` to create a Makefile...")
+        prefix = os.environ["CONFIG_PREFIX"]
+        includedir = os.environ["INCLUDE_PATH"]
         exit_code, output = subprocess.getstatusoutput(
-            "cd ./xmlstarlet/ && ./configure --prefix={0} --includedir={1} && cd  ..".format(
-                os.environ["CONFIG_PREFIX"], os.environ["INCLUDE_PATH"]
-            )
+            "cd ./xmlstarlet/ && "
+            f"./configure --prefix={prefix} --includedir={includedir} && cd  .."
         )
 
         print(output)

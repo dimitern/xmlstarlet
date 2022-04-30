@@ -116,7 +116,7 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.6 and later (currently, up to 3.9).
+3. The pull request should work for Python 3.6 and later (currently, up to 3.10).
    Check https://github.com/dimitern/xmlstarlet/pulls and make sure all checks
    pass OK. Binary wheels are built automatically for each PR, or `git push` to
    a branch.

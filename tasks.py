@@ -54,23 +54,25 @@ def dist(c, wheel=False):
     Build source and (optionally) a binary wheel packages, optionally installing it.
     """
     commands = "sdist" if not wheel else "sdist bdist_wheel"
-    c.run("python {} {}".format(SETUP_FILE, commands))
+    c.run(f"python {SETUP_FILE} {commands}")
 
 
 @task(
-    pre=[dist], help={"check": "Checks if source is formatted without applying changes"}
-)  # pylint: disable=redefined-builtin
-def format(c, check=False):
+    name="format",
+    pre=[dist],
+    help={"check": "Checks if source is formatted without applying changes"},
+)
+def format_sources(c, check=False):
     """
     Format code
     """
     python_dirs_string = " ".join(PYTHON_DIRS)
     # Run black
     black_options = "--check" if check else ""
-    c.run("black {} . {}".format(black_options, python_dirs_string))
+    c.run(f"black {black_options} . {python_dirs_string}")
     # Run isort
     isort_options = "--check-only" if check else ""
-    c.run("isort {} {}".format(isort_options, python_dirs_string))
+    c.run(f"isort {isort_options} {python_dirs_string}")
 
 
 @task(pre=[dist])
@@ -88,7 +90,7 @@ def test(c):
     Run tests
     """
     pty = platform.system() == "Linux"
-    c.run("python {} test".format(SETUP_FILE), pty=pty)
+    c.run(f"python {SETUP_FILE} test", pty=pty)
 
 
 @task(
@@ -101,7 +103,7 @@ def coverage(c, publish=False, browser=False):
     """
     Create coverage report
     """
-    c.run("coverage run --source {} -m pytest".format(SOURCE_DIR))
+    c.run(f"coverage run --source {SOURCE_DIR} -m pytest")
     c.run("coverage report")
     if publish:
         # Publish the results via coveralls
@@ -118,7 +120,7 @@ def docs(c, browser=False):
     """
     Generate documentation
     """
-    c.run("sphinx-build -b html {} {}".format(DOCS_DIR, DOCS_BUILD_DIR))
+    c.run(f"sphinx-build -b html {DOCS_DIR} {DOCS_BUILD_DIR}")
     if browser:
         webbrowser.open(DOCS_INDEX.as_uri())
 
@@ -128,7 +130,7 @@ def clean_docs(c):
     """
     Clean up files from documentation builds
     """
-    c.run("rm -fr {}".format(DOCS_BUILD_DIR))
+    c.run(f"rm -fr {DOCS_BUILD_DIR}")
 
 
 @task
@@ -157,10 +159,8 @@ def clean_python(c):
     c.run("find . -name '__pycache__' -exec rm -fr {} +")
 
 
-@task(
-    help={"tox": "Clean tox directory {!r} as well"}
-)  # pylint: disable=unused-argument
-def clean_tests(c, tox=False):
+@task(help={"tox": "Clean tox directory {!r} as well"})
+def clean_tests(c, tox=False):  # pylint: disable=unused-argument
     """
     Clean up files from testing
     """
@@ -194,8 +194,10 @@ def release(c, dry_run=False):
     done. Working directory must be clean (no uncommited
     changes).
     """
-    c.run("tox {}".format("--skip-pkg-install -e py37" if not dry_run else ""))
-    c.run("bump2version {} --verbose patch".format("--dry-run" if dry_run else ""))
+    tox_args = "--skip-pkg-install -e py37" if not dry_run else ""
+    c.run(f"tox {tox_args}")
+    dry = "--dry-run" if dry_run else ""
+    c.run(f"bump2version {dry} --verbose patch")
 
     if not dry_run:
         c.run("git push --tags")
