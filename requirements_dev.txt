@@ -1,15 +1,12 @@
 black
 bumpversion
-cffi==1.15.0
 coverage
-docutils
-flake8
-invoke
+docutils<0.18,>=0.14
+flake8<4.0
 isort
-pycparser
 pylint
 pytest
-Sphinx
+Sphinx<=4.3
 sphinxcontrib-applehelp
 sphinxcontrib-devhelp
 sphinxcontrib-htmlhelp
@@ -19,3 +16,5 @@ sphinxcontrib-serializinghtml
 tox
 twine
 auditwheel
+markupsafe==2.0.1
+importlib-metadata>=4.4

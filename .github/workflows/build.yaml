@@ -8,11 +8,10 @@ on: [push, pull_request]
 # Install Linux and MacOS required libraries / tools.
 env:
   CIBW_SKIP: "cp27-* cp35-* pp*"
-  CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel"
+  CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel || apt-get -y install libxslt1-dev libxml2-dev"
   CIBW_BEFORE_BUILD_MACOS: "brew install automake"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: "pytest {project}"
-  MACOSX_DEPLOYMENT_TARGET: "10.15"
   CIBW_DEPENDENCY_VERSIONS: "latest"
 
 jobs:
@@ -41,7 +40,7 @@ jobs:
         shell: cmd
         run: |
           call xmlstarlet\build_msvc.bat
-          python -m pip --disable-pip-version-check install cibuildwheel==1.7.2
+          python -m pip --disable-pip-version-check install cibuildwheel==2.5.0
           python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*win32"
@@ -57,7 +56,7 @@ jobs:
         shell: cmd
         run: |
           call xmlstarlet\build_msvc.bat
-          python -m pip --disable-pip-version-check install cibuildwheel==1.7.2
+          python -m pip --disable-pip-version-check install cibuildwheel==2.5.0
           python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "*win_amd64"
@@ -68,7 +67,7 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           python -m pip install --upgrade pip wheel setuptools
-          python -m pip --disable-pip-version-check install cibuildwheel==1.7.2
+          python -m pip --disable-pip-version-check install cibuildwheel==2.5.0
           python -m cibuildwheel --output-dir wheelhouse
         
       - uses: actions/upload-artifact@v3

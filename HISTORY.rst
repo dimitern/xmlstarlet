@@ -2,6 +2,14 @@
 History
 =======
 
+1.6.8 (unreleased)
+------------------
+
+* Added Python 3.10 support.
+* Fixed issue #199 (pending confirmation) - upgraded libxml2 and libxslt versions to fix CVEs
+* Upgraded development and build-time dependencies for `wheel`, `cibuildwheel`, `Sphinx`, and `flake8`.
+* Formatting and linting fixes
+
 1.6.7 (2020-12-24)
 ------------------
 

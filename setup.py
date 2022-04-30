@@ -6,15 +6,15 @@ import sys
 
 from setuptools import find_packages, setup
 
-with open("README.rst") as readme_file:
+with open("README.rst", encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst") as history_file:
+with open("HISTORY.rst", encoding="utf-8") as history_file:
     history = history_file.read()
 
-requirements = ["cffi>=1.0.0"]
+requirements = ["cffi>=1.15.0"]
 
-setup_requirements = ["pytest-runner", "setuptools", "wheel", "cffi>=1.0.0"]
+setup_requirements = ["pytest-runner", "setuptools", "wheel>=0.37", "cffi>=1.15.0"]
 
 if sys.version_info[:2] in ((3, 7), (3, 6)):
     setup_requirements += ["pickle5"]
@@ -38,6 +38,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     description="XMLStarlet Toolkit: Python CFFI bindings",
     install_requires=requirements,
