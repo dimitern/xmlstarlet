@@ -30,7 +30,7 @@ _lib = xmlstarlet._xmlstarlet.lib  # pylint: disable=protected-access
 
 __author__ = """Mikhail Grushinskiy"""
 __email__ = "mgrouch@users.sourceforge.net"
-__version__ = "1.6.7"
+__version__ = "1.6.8"
 
 
 def _call_main(*args, main_func, escape_flag=-1):
