@@ -2,7 +2,7 @@ black
 bumpversion
 coverage
 docutils<0.18,>=0.14
-flake8<4.0
+flake8<5.0
 isort
 pylint
 pytest
