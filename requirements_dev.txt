@@ -16,5 +16,5 @@ sphinxcontrib-serializinghtml
 tox
 twine
 auditwheel
-markupsafe==2.0.1
+markupsafe==2.1.1
 importlib-metadata>=4.4
