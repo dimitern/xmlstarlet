@@ -29,10 +29,10 @@ jobs:
       - uses: actions/setup-python@v4
         name: Install Python
         with:
-          python-version: '3.7'
+          python-version: '3.6'
 
       - name: Install cibuildwheel
-        run: python -m pip install --upgrade cibuildwheel==2.8.1
+        run: python -m pip install --upgrade cibuildwheel==2.8.1 && python -m cibuildwheel --version
 
       - uses: ilammy/msvc-dev-cmd@v1
         with:
