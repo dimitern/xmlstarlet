@@ -57,9 +57,7 @@ if os.name != "nt":
         + subprocess.getoutput("xslt-config --libs").split()
     )
 
-    LIBRARY_DIRS += [
-        ld.replace("-L", "") for ld in EXTRA_LDFLAGS if ld.startswith("-L")
-    ]
+    LIBRARY_DIRS += [ld.replace("-L", "") for ld in EXTRA_LDFLAGS if ld.startswith("-L")]
     LIBRARIES += [lb.replace("-l", "") for lb in EXTRA_LDFLAGS if lb.startswith("-l")]
 
     INCLUDE_DIRS = [SOURCE_DIR, C_SOURCE_DIR] + [
