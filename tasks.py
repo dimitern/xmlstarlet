@@ -140,9 +140,7 @@ def clean_build(c):
     """
     c.run("rm -fr build/")
     c.run("rm -fr dist/")
-    c.run(
-        "rm -fr xmlstarlet/config.h " "xmlstarlet/Makefile " "xmlstarlet/config.status"
-    )
+    c.run("rm -fr xmlstarlet/config.h " "xmlstarlet/Makefile " "xmlstarlet/config.status")
     c.run("rm -fr .eggs/")
     c.run("find . -name '*.egg-info' -exec rm -fr {} +")
     c.run("find . -name '*.egg' -exec rm -f {} +")

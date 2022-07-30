@@ -46,16 +46,16 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"XMLStarlet CFFI"
-copyright = u"2019, Mikhail Grushinskiy"
-author = u"Mikhail Grushinskiy"
+project = "XMLStarlet CFFI"
+copyright = "2019, Mikhail Grushinskiy"
+author = "Mikhail Grushinskiy"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
 # the built documents.
 #
 # The short X.Y version.
-version = "1.6.7"
+version = "1.6.8"
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -134,8 +134,8 @@ latex_documents = [
     (
         master_doc,
         "xmlstarlet.tex",
-        u"XMLStarlet CFFI Documentation",
-        u"Mikhail Grushinskiy",
+        "XMLStarlet CFFI Documentation",
+        "Mikhail Grushinskiy",
         "manual",
     )
 ]
@@ -145,7 +145,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "xmlstarlet", u"XMLStarlet CFFI Documentation", [author], 1)]
+man_pages = [(master_doc, "xmlstarlet", "XMLStarlet CFFI Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -157,7 +157,7 @@ texinfo_documents = [
     (
         master_doc,
         "xmlstarlet",
-        u"XMLStarlet CFFI Documentation",
+        "XMLStarlet CFFI Documentation",
         author,
         "xmlstarlet",
         "XMLStarlet Toolkit: Python CFFI Bindings.",

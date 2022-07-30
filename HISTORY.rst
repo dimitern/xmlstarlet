@@ -2,6 +2,12 @@
 History
 =======
 
+1.6.9 (unreleased)
+------------------
+
+* Now using latest `cibuildwheel` 2.8.1, which supports more architectures and builds.
+* Updated versions in `requirements.txt`.
+
 1.6.8 (2022-04-30)
 ------------------
 
