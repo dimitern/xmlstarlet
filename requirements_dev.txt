@@ -1,7 +1,7 @@
 black
 bumpversion
 coverage
-docutils>=0.14,<0.19
+docutils>=0.14,<0.20
 flake8<5.0
 isort
 pylint
