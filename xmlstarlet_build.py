@@ -25,9 +25,7 @@ if os.name != "nt":
 
     if not HAVE_CONFIGURE:
         print("Generating `configure` with `autoreconf`...")
-        exit_code, output = subprocess.getstatusoutput(
-            "cd ./xmlstarlet/ && autoreconf -sif && cd  .."
-        )
+        exit_code, output = subprocess.getstatusoutput("cd ./xmlstarlet/ && autoreconf -sif && cd  ..")
 
         print(output)
         if exit_code != 0:
@@ -53,16 +51,13 @@ if os.name != "nt":
     )
 
     EXTRA_LDFLAGS = (
-        subprocess.getoutput("xml2-config --libs").split()
-        + subprocess.getoutput("xslt-config --libs").split()
+        subprocess.getoutput("xml2-config --libs").split() + subprocess.getoutput("xslt-config --libs").split()
     )
 
     LIBRARY_DIRS += [ld.replace("-L", "") for ld in EXTRA_LDFLAGS if ld.startswith("-L")]
     LIBRARIES += [lb.replace("-l", "") for lb in EXTRA_LDFLAGS if lb.startswith("-l")]
 
-    INCLUDE_DIRS = [SOURCE_DIR, C_SOURCE_DIR] + [
-        d.replace("-I", "") for d in EXTRA_CFLAGS if d.startswith("-I")
-    ]
+    INCLUDE_DIRS = [SOURCE_DIR, C_SOURCE_DIR] + [d.replace("-I", "") for d in EXTRA_CFLAGS if d.startswith("-I")]
     LIBRARIES += [lb.replace("-l", "") for lb in EXTRA_CFLAGS if lb.startswith("-l")]
 
     os.environ.update(
@@ -76,8 +71,7 @@ if os.name != "nt":
         prefix = os.environ["CONFIG_PREFIX"]
         includedir = os.environ["INCLUDE_PATH"]
         exit_code, output = subprocess.getstatusoutput(
-            "cd ./xmlstarlet/ && "
-            f"./configure --prefix={prefix} --includedir={includedir} && cd  .."
+            "cd ./xmlstarlet/ && " f"./configure --prefix={prefix} --includedir={includedir} && cd  .."
         )
 
         print(output)
@@ -89,9 +83,7 @@ if os.name != "nt":
 
     if HAVE_MAKEFILE:
         print("Compiling xmlstarlet C sources...")
-        exit_code, output = subprocess.getstatusoutput(
-            "cd ./xmlstarlet/ && make -j && make check && cd  .."
-        )
+        exit_code, output = subprocess.getstatusoutput("cd ./xmlstarlet/ && make -j && make check && cd  ..")
 
         print(output)
         if exit_code != 0:
@@ -102,9 +94,7 @@ else:
     SOURCES = [
         os.path.relpath(s, ROOT_DIR)
         for s in glob(os.path.join(C_SOURCE_DIR, "**"), recursive=True)
-        if s.endswith(".c")
-        and "_xmlstarlet" not in s
-        and ("win32_xml_ls.c" in s or "xml_ls.c" not in s)
+        if s.endswith(".c") and "_xmlstarlet" not in s and ("win32_xml_ls.c" in s or "xml_ls.c" not in s)
     ]
     INCLUDE_DIRS = [
         SOURCE_DIR,
