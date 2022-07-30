@@ -9,7 +9,7 @@ on: [push, pull_request]
 env:
   CIBW_SKIP: "cp27-* cp35-* pp*"
   CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel || apt-get -y install libxslt1-dev libxml2-dev || apk add libxml2-dev libxslt-dev"
-  CIBW_BEFORE_BUILD_MACOS: "brew install automake"
+  CIBW_BEFORE_BUILD_MACOS: "brew install automake && pip install --upgrade cibuildwheel>=2.8.1"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: "pytest {project}"
   CIBW_DEPENDENCY_VERSIONS: "latest"
