@@ -29,7 +29,6 @@ jobs:
       - name: Prepare Windows builds
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.arch }}
           toolset: "14.0"
 
       - name: Build wheels
