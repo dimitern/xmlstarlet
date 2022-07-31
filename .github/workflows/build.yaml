@@ -10,7 +10,7 @@ env:
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
   CIBW_SKIP: "cp27-* cp35-* pp*"
   CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel || apt-get -y install libxslt1-dev libxml2-dev || apk add libxml2-dev libxslt-dev"
-  CIBW_BEFORE_BUILD_MACOS: "brew install automake"
+  CIBW_BEFORE_BUILD_MACOS: "brew unlink libxml2 && brew uninstall libxml2 && brew install libxml2 automake"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: "pytest {project}"
   CIBW_DEPENDENCY_VERSIONS: "pinned"
