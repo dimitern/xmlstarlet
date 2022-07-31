@@ -9,8 +9,6 @@ on: [push, pull_request]
 env:
   CIBW_PROJECT_REQUIRES_PYTHON: ">=3.6"
   CIBW_SKIP: "cp27-* cp35-* pp*"
-  CIBW_BEFORE_BUILD_LINUX: "yum install -y libxslt-devel || apt-get -y install libxslt1-dev libxml2-dev || apk add libxml2-dev libxslt-dev"
-  CIBW_BEFORE_BUILD_MACOS: "brew uninstall --force libxml2 && brew cleanup -s libxml2 && brew cleanup --prune-prefix && brew install libxml2 automake"
   CIBW_TEST_REQUIRES: pytest
   CIBW_TEST_COMMAND: "pytest {project}"
   CIBW_DEPENDENCY_VERSIONS: "pinned"
@@ -27,49 +25,76 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: '3.7'
-
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x86
-          
-      - name: Build dependencies & wheels (Windows / x86)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          pip install --upgrade "cibuildwheel>=2.8.1"
-          call xmlstarlet\build_msvc.bat
-          python -m cibuildwheel --output-dir wheelhouse
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.8.1
         env:
-          CIBW_BUILD: "*win32"
-          DISTUTILS_USE_SDK: 1
-          MSSdk: 1
-
-      - uses: ilammy/msvc-dev-cmd@v1
+          CIBW_BEFORE_BUILD_LINUX: >
+              yum install -y libxslt-devel ||
+              apt-get -y install libxslt1-dev libxml2-dev ||
+              apk add libxml2-dev libxslt-dev
+          CIBW_ENVIRONMENT_MACOS: >
+              ARCHFLAGS="-arch i386 -arch x86_64"
+              PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/opt/libxslt/lib/pkgconfig"
+              LDFLAGS="-L/usr/local/opt/libxml2/lib" "-L/usr/local/opt/libxslt/lib"
+              CPPFLAGS="-I/usr/local/opt/libxml2/include" "-I/usr/local/opt/libxslt/include"
+          CIBW_BEFORE_BUILD_MACOS: >
+              brew uninstall --force libxml2 libxslt libffi &&
+              brew cleanup -s libxml2 libxslt libffi &&
+              brew cleanup --prune-prefix &&
+              brew install libxml2 libxslt automake pkg-config
+          CIBW_ENVIRONMENT_WINDOWS: >
+              CIBW_BUILD="*win32 *win_amd64"
+              DISTUTILS_USE_SDK=1
+              MSSdk=1
+          CIBW_BEFORE_BULD_WINDOWS: "call xmlstarlet\build_msvc.bat"
         with:
-          arch: amd64
+          package-dir: .
+          output-dir: wheelhouse
+        #   config-file: "{package}/pyproject.toml"
 
-      - name: Build dependencies & wheels (Windows / amd64)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          pip install --upgrade "cibuildwheel>=2.8.1"
-          call xmlstarlet\build_msvc.bat
-          python -m cibuildwheel --output-dir wheelhouse
-        env:
-          CIBW_BUILD: "*win_amd64"
-          DISTUTILS_USE_SDK: 1
-          MSSdk: 1
-                      
-      - name: Build wheels with cibuildwheel (Linux & MacOS)
-        if: runner.os != 'Windows'
-        run: |
-          pip install --upgrade pip wheel setuptools "cibuildwheel>=2.8.1"
-          python -m cibuildwheel --output-dir wheelhouse
-        
+      # - uses: actions/setup-python@v4
+      #   name: Install Python
+      #   with:
+      #     python-version: '3.7'
+
+      # - uses: ilammy/msvc-dev-cmd@v1
+      #   with:
+      #     arch: x86
+
+      # - name: Build dependencies & wheels (Windows / x86)
+      #   if: runner.os == 'Windows'
+      #   shell: cmd
+      #   run: |
+      #     pip install --upgrade "cibuildwheel>=2.8.1"
+      #     call xmlstarlet\build_msvc.bat
+      #     python -m cibuildwheel --output-dir wheelhouse
+      #   env:
+      #     CIBW_BUILD: "*win32"
+      #     DISTUTILS_USE_SDK: 1
+      #     MSSdk: 1
+
+      # - uses: ilammy/msvc-dev-cmd@v1
+      #   with:
+      #     arch: amd64
+
+      # - name: Build dependencies & wheels (Windows / amd64)
+      #   if: runner.os == 'Windows'
+      #   shell: cmd
+      #   run: |
+      #     pip install --upgrade "cibuildwheel>=2.8.1"
+      #     call xmlstarlet\build_msvc.bat
+      #     python -m cibuildwheel --output-dir wheelhouse
+      #   env:
+      #     CIBW_BUILD: "*win_amd64"
+      #     DISTUTILS_USE_SDK: 1
+      #     MSSdk: 1
+
+      # - name: Build wheels with cibuildwheel (Linux & MacOS)
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     pip install --upgrade pip wheel setuptools "cibuildwheel>=2.8.1"
+      #     python -m cibuildwheel --output-dir wheelhouse
+
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
