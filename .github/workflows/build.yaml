@@ -31,7 +31,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           toolset: "14.0"
-           arch: ${{ matrix.arch }}
+          arch: ${{ matrix.arch }}
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
