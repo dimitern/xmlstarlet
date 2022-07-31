@@ -1,10 +1,10 @@
 @echo off
 
-choco install -y -r tartool wget sed gawk
+choco install -y -r tartool wget sed gawk nmake
 
 set BASE_URL=ftp://xmlsoft.org/libxml2/
-set XML2_TARBALL=libxml2-2.9.3.tar.gz
-set XSLT_TARBALL=libxslt-1.1.28.tar.gz
+set XML2_TARBALL=libxml2-2.9.14.tar.gz
+set XSLT_TARBALL=libxslt-1.1.34.tar.gz
 
 set PREFIX=C:\opt
 
@@ -23,14 +23,14 @@ wget --output-document=%XSLT_TARBALL% %BASE_URL%%XSLT_TARBALL%
 tar -xf %XSLT_TARBALL%
 
 echo Building libxml2...
-cd libxml2-2.9.3\win32
+cd libxml2-2.9.14\win32
 cscript configure.js debug=no static=yes compiler=msvc iconv=no python=no  prefix=%PREFIX%
 nmake all
 nmake install
 cd ..\..
 
 echo Building libxslt...
-cd libxslt-1.1.28\win32
+cd libxslt-1.1.34\win32
 cscript configure.js debug=no static=yes compiler=msvc iconv=no debugger=no include=%PREFIX%\include\libxml2 lib=%PREFIX%\lib prefix=%PREFIX%
 
 rem Patch the win32config.h to make it compatible with VS 2015+
