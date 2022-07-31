@@ -28,25 +28,25 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
         env:
-          CIBW_BEFORE_BUILD_LINUX: >
+          CIBW_BEFORE_BUILD_ALL_LINUX: >
               yum install -y libxslt-devel ||
               apt-get -y install libxslt1-dev libxml2-dev ||
               apk add libxml2-dev libxslt-dev
+          CIBW_BEFORE_BUILD_ALL_MACOS: >
+              brew uninstall --force --ignore-dependencies libxml2 libxslt libffi &&
+              brew cleanup -s libxml2 libxslt libffi &&
+              brew cleanup --prune-prefix &&
+              brew install libxml2 libxslt automake pkg-config
+          CIBW_BEFORE_BULD_ALL_WINDOWS: "call xmlstarlet\build_msvc.bat"
           CIBW_ENVIRONMENT_MACOS: >
               ARCHFLAGS="-arch i386 -arch x86_64"
               PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/opt/libxslt/lib/pkgconfig"
               LDFLAGS="-L/usr/local/opt/libxml2/lib -L/usr/local/opt/libxslt/lib"
               CPPFLAGS="-I/usr/local/opt/libxml2/include -I/usr/local/opt/libxslt/include -I/usr/local/opt/libffi/include"
-          CIBW_BEFORE_BUILD_MACOS: >
-              brew uninstall --force libxml2 libxslt libffi &&
-              brew cleanup -s libxml2 libxslt libffi &&
-              brew cleanup --prune-prefix &&
-              brew install libxml2 libxslt automake pkg-config
           CIBW_ENVIRONMENT_WINDOWS: >
               CIBW_BUILD="*win32 *win_amd64"
               DISTUTILS_USE_SDK=1
               MSSdk=1
-          CIBW_BEFORE_BULD_WINDOWS: "call xmlstarlet\build_msvc.bat"
         with:
           package-dir: .
           output-dir: wheelhouse
