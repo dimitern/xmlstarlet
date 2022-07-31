@@ -47,7 +47,6 @@ examples/elem-uniq\
 examples/escape1\
 examples/exslt-ed\
 examples/exslt1\
-examples/external-entity\
 examples/findfile1\
 examples/genxml1\
 examples/hello1\

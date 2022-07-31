@@ -1,6 +1,6 @@
 @echo off
 
-choco install -y -r tartool wget sed gawk
+choco install -y -r --no-progress tartool wget sed gawk
 
 set XML2_URL=https://download.gnome.org/sources/libxml2/2.9/
 set XSLT_URL=https://download.gnome.org/sources/libxslt/1.1/
@@ -23,9 +23,11 @@ cd _build\
 
 wget -q --output-document=%XML2_TARBALL% %XML2_URL%%XML2_TARBALL%
 tar -xf %XML2_TARBALL%
+dir %XML2_TARBALL%
 
 wget -q --output-document=%XSLT_TARBALL% %XSLT_URL%%XSLT_TARBALL%
 tar -xf %XSLT_TARBALL%
+dir %XML2_TARBALL%
 
 echo Building libxml2...
 cd libxml2-2.9.1\win32

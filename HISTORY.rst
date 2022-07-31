@@ -5,8 +5,11 @@ History
 1.6.9 (unreleased)
 ------------------
 
-* Now using latest `cibuildwheel` 2.8.1, which supports more architectures and builds.
+* Now using latest `cibuildwheel` 2.8.1, which supports more architectures and builds, including
+  PyPy 3.7 - 3.10 (on Linux x86 and x64, and MacOS x64).
 * Updated versions in `requirements.txt`.
+* Fixed security warnings (e.g. CVE-611) around xml2 and xslt libraries, pinning their versions to
+  at least libxml2 2.9.1 and libxslt 1.1.28.
 
 1.6.8 (2022-04-30)
 ------------------

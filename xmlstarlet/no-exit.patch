@@ -205,7 +205,7 @@ index cf47cc2..f4e3091 100644
  
  /**
 diff --git a/xmlstarlet/src/xml_C14N.c b/xmlstarlet/src/xml_C14N.c
-index 4a0becc..2a6ccb5 100644
+index 4a0becc..c011bb5 100644
 --- a/xmlstarlet/src/xml_C14N.c
 +++ b/xmlstarlet/src/xml_C14N.c
 @@ -29,14 +29,14 @@
@@ -225,7 +225,11 @@ index 4a0becc..2a6ccb5 100644
  }
  
  static xmlXPathObjectPtr
-@@ -66,7 +66,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+@@ -62,11 +62,10 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+      */
+ 
+     doc = xmlReadFile(xml_filename, NULL,
+-        XML_PARSE_NOENT | XML_PARSE_DTDLOAD |
          XML_PARSE_DTDATTR | (nonet? XML_PARSE_NONET:0));
      if (doc == NULL) {
          fprintf(stderr, "Error: unable to parse file \"%s\"\n", xml_filename);
@@ -234,7 +238,7 @@ index 4a0becc..2a6ccb5 100644
      }
      
      /*
-@@ -75,7 +75,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+@@ -75,7 +74,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
      if(xmlDocGetRootElement(doc) == NULL) {
          fprintf(stderr,"Error: empty document for file \"%s\"\n", xml_filename);
          xmlFreeDoc(doc);
@@ -243,7 +247,7 @@ index 4a0becc..2a6ccb5 100644
      }
  
      /* 
-@@ -86,7 +86,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+@@ -86,7 +85,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
          if(xpath == NULL) {
              fprintf(stderr,"Error: unable to evaluate xpath expression\n");
              xmlFreeDoc(doc); 
@@ -252,7 +256,7 @@ index 4a0becc..2a6ccb5 100644
          }
      }
  
-@@ -102,7 +102,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+@@ -102,7 +101,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
          fprintf(stderr,"Error: failed to canonicalize XML file \"%s\" (ret=%d)\n",
              xml_filename, ret);
          xmlFreeDoc(doc);
@@ -261,7 +265,7 @@ index 4a0becc..2a6ccb5 100644
      }
   
      /*
-@@ -115,7 +115,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
+@@ -115,7 +114,7 @@ run_c14n(const char* xml_filename, int with_comments, int exclusive,
  }
  
  int c14nMain(int argc, char **argv) {
@@ -270,7 +274,7 @@ index 4a0becc..2a6ccb5 100644
      
      /*
       * Init libxml
-@@ -138,9 +138,10 @@ int c14nMain(int argc, char **argv) {
+@@ -138,9 +137,10 @@ int c14nMain(int argc, char **argv) {
          if (argc >= 3)
          {
              if (strcmp(argv[2], "--help") == 0 || strcmp(argv[2], "-h") == 0)
@@ -283,7 +287,7 @@ index 4a0becc..2a6ccb5 100644
      } else if(strcmp(argv[2], "--with-comments") == 0) {
          ret = run_c14n(argv[3], 1, 0, (argc > 4) ? argv[4] : NULL, NULL, nonet);
      } else if(strcmp(argv[2], "--without-comments") == 0) {
-@@ -161,7 +162,7 @@ int c14nMain(int argc, char **argv) {
+@@ -161,7 +161,7 @@ int c14nMain(int argc, char **argv) {
          if(list != NULL) xmlFree(list);
      } else {
          fprintf(stderr, "error: bad arguments.\n");
@@ -292,6 +296,15 @@ index 4a0becc..2a6ccb5 100644
      }
  
      /* 
+@@ -240,7 +240,7 @@ load_xpath_expr (xmlDocPtr parent_doc, const char* filename) {
+     xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
+     xmlSubstituteEntitiesDefault(1);
+ 
+-    doc = xmlReadFile(filename, NULL, XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR);
++    doc = xmlReadFile(filename, NULL, XML_PARSE_DTDATTR);
+     if (doc == NULL) {
+         fprintf(stderr, "Error: unable to parse file \"%s\"\n", filename);
+         return(NULL);
 diff --git a/xmlstarlet/src/xml_depyx.c b/xmlstarlet/src/xml_depyx.c
 index 1935fc0..acb3b5e 100644
 --- a/xmlstarlet/src/xml_depyx.c
@@ -932,7 +945,7 @@ index ab295f1..47357b0 100644
  
      xmlInitParser();
 diff --git a/xmlstarlet/src/xml_select.c b/xmlstarlet/src/xml_select.c
-index 34ba20e..fec238d 100644
+index 34ba20e..259e5fb 100644
 --- a/xmlstarlet/src/xml_select.c
 +++ b/xmlstarlet/src/xml_select.c
 @@ -154,7 +154,7 @@ caseSortFunction(xsltTransformContextPtr ctxt, xmlNodePtr *sorts,
@@ -1069,7 +1082,7 @@ index 34ba20e..fec238d 100644
          }
  
          res = xsltTransform(xsltOps, doc, params, style, filename);
-@@ -703,11 +711,16 @@ selMain(int argc, char **argv)
+@@ -703,12 +711,16 @@ selMain(int argc, char **argv)
      xmlDocPtr style_tree;
      int xml_options = 0;
  
@@ -1079,15 +1092,16 @@ index 34ba20e..fec238d 100644
      selInitOptions(&ops);
      xsltInitOptions(&xsltOps);
      start = selParseOptions(&ops, argc, argv);
+-    xml_options |= XML_PARSE_NOENT; /* substitute entities */
 +    if (start < 0)
 +    {
 +        status = -start;
 +        goto cleanup;
 +    }
-     xml_options |= XML_PARSE_NOENT; /* substitute entities */
      xml_options |= XML_PARSE_DTDATTR; /* use default attrib values */
      xml_options |= ops.nonet? XML_PARSE_NONET : 0;
-@@ -717,10 +730,20 @@ selMain(int argc, char **argv)
+     xsltOps.nonet = ops.nonet;
+@@ -717,10 +729,20 @@ selMain(int argc, char **argv)
      xsltSetSortFunc(caseSortFunction);
  
      /* set parameters */
@@ -1109,7 +1123,7 @@ index 34ba20e..fec238d 100644
  
      if (ops.printXSLT)
      {
-@@ -731,7 +754,8 @@ selMain(int argc, char **argv)
+@@ -731,7 +753,8 @@ selMain(int argc, char **argv)
              xmlTextReaderClose(reader);
          }
          xmlDocFormatDump(stdout, style_tree, 1);
@@ -1119,7 +1133,7 @@ index 34ba20e..fec238d 100644
      }
  
      for (n=i; n<argc; n++)
-@@ -740,6 +764,7 @@ selMain(int argc, char **argv)
+@@ -740,6 +763,7 @@ selMain(int argc, char **argv)
      if (i == argc)
          do_file("-", style_tree, xml_options, &ops, &xsltOps, &status);
  
@@ -1248,7 +1262,7 @@ index b5f8355..87f9298 100644
      /* free resources */
      trCleanupParams(xsltParams);
 diff --git a/xmlstarlet/src/xml_validate.c b/xmlstarlet/src/xml_validate.c
-index 6fe5584..14ec7d5 100644
+index 6fe5584..207eb63 100644
 --- a/xmlstarlet/src/xml_validate.c
 +++ b/xmlstarlet/src/xml_validate.c
 @@ -71,7 +71,7 @@ typedef valOptions *valOptionsPtr;
@@ -1321,9 +1335,12 @@ index 6fe5584..14ec7d5 100644
              }
          
              if (ops->err)
-@@ -291,9 +291,11 @@ valMain(int argc, char **argv)
+@@ -289,11 +289,13 @@ valMain(int argc, char **argv)
+     static valOptions ops;
+     static ErrorInfo errorInfo;
      int invalidFound = 0;
-     int options = XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR;
+-    int options = XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR;
++    int options = XML_PARSE_DTDATTR;
  
 -    if (argc <= 2) valUsage(argc, argv, EXIT_BAD_ARGS);
 +    if (argc <= 2) return valUsage(argc, argv, EXIT_BAD_ARGS);

@@ -42,7 +42,6 @@ elem-uniq
 escape1
 exslt-ed
 exslt1
-external-entity
 findfile1
 genxml1
 hello1
