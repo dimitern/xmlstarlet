@@ -2,9 +2,10 @@
 
 choco install -y -r tartool wget sed gawk
 
-set BASE_URL=ftp://xmlsoft.org/libxml2/
-set XML2_TARBALL=libxml2-2.9.1 .tar.gz
-set XSLT_TARBALL=libxslt-1.1.28.tar.gz
+set XML2_URL=https://download.gnome.org/sources/libxml2/2.9/
+set XSLT_URL=https://download.gnome.org/sources/libxslt/1.1/
+set XML2_TARBALL=libxml2-2.9.1.tar.xz
+set XSLT_TARBALL=libxslt-1.1.28.tar.xz
 
 set PREFIX=C:\opt
 
@@ -16,10 +17,10 @@ md _build
 echo Fetching sources for dependencies...
 cd _build\
 
-wget --output-document=%XML2_TARBALL% %BASE_URL%%XML2_TARBALL%
+wget --output-document=%XML2_TARBALL% %XML2_URL%%XML2_TARBALL%
 tar -xf %XML2_TARBALL%
 
-wget --output-document=%XSLT_TARBALL% %BASE_URL%%XSLT_TARBALL%
+wget --output-document=%XSLT_TARBALL% %XSLT_URL%%XSLT_TARBALL%
 tar -xf %XSLT_TARBALL%
 
 echo Building libxml2...
