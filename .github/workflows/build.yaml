@@ -34,11 +34,13 @@ jobs:
           arch: "x86"
 
       - name: Build Windows x86 wheels
+        if: runner.os == 'Windows'
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BUILD: "*win32"
           CIBW_BEFORE_BUILD_WINDOWS: "call xmlstarlet\\setup_msvc.bat"
           CIBW_ENVIRONMENT_WINDOWS: >
+            CIBW_ARCHS_WINDOWS=auto32
             PLATFORM_NAME=x86
             DISTUTILS_USE_SDK=1
             MSSdk=1
@@ -53,11 +55,13 @@ jobs:
           arch: "x64"
 
       - name: Build Windows x86 wheels
+        if: runner.os == 'Windows'
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BUILD: "*win_amd64"
           CIBW_BEFORE_BUILD_WINDOWS: "call xmlstarlet\\setup_msvc.bat"
           CIBW_ENVIRONMENT_WINDOWS: >
+            CIBW_ARCHS_WINDOWS=auto64
             PLATFORM_NAME=amd64
             DISTUTILS_USE_SDK=1
             MSSdk=1
@@ -66,6 +70,7 @@ jobs:
           output-dir: wheelhouse
 
       - name: Build Linux and MacOS wheels
+        if: runner.os != 'Windows'
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_SKIP: "*win*"
