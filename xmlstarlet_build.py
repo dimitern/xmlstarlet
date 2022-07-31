@@ -90,7 +90,7 @@ if os.name != "nt":
             sys.exit(exit_code)
 
 else:
-    os.environ["PREFIX"] = "C:\\opt"  # configured by build_msvc.bat.
+    os.environ["PREFIX"] = "C:\\opt"  # configured by setup_msvc.bat.
     SOURCES = [
         os.path.relpath(s, ROOT_DIR)
         for s in glob(os.path.join(C_SOURCE_DIR, "**"), recursive=True)

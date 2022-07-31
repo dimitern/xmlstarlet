@@ -1,6 +1,6 @@
 @echo off
 
-choco install -y -r -q tartool wget sed gawk
+choco install -y -r tartool wget sed gawk
 
 set XML2_URL=https://download.gnome.org/sources/libxml2/2.9/
 set XSLT_URL=https://download.gnome.org/sources/libxslt/1.1/
@@ -30,7 +30,7 @@ tar -xf %XSLT_TARBALL%
 echo Building libxml2...
 cd libxml2-2.9.1\win32
 
-cscript configure.js debug=no static=yes compiler=msvc iconv=no python=no prefix=%PREFIX%
+cscript configure.js debug=no static=yes compiler=msvc iconv=no python=no prefix=%PREFIX% cruntime=/MT
 
 rem Patch the win32config.h / config.h to make it compatible with VS 2015+ (libxml2)
 type ..\include\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\include\win32config.h.patch
@@ -48,7 +48,7 @@ cd ..\..
 echo Building libxslt...
 cd libxslt-1.1.28\win32
 
-cscript configure.js debug=no static=yes compiler=msvc iconv=no debugger=no include=%PREFIX%\include\libxml2 lib=%PREFIX%\lib prefix=%PREFIX%
+cscript configure.js debug=no static=yes compiler=msvc iconv=no debugger=no include=%PREFIX%\include\libxml2 lib=%PREFIX%\lib prefix=%PREFIX% cruntime=/MT
 
 rem Patch the win32config.h to make it compatible with VS 2015+ (libxslt)
 type ..\libxslt\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\libxslt\win32config.h.patch
@@ -67,7 +67,7 @@ cd ..\..\..
 echo Building xmlstarlet...
 cd xmlstarlet\win32\
 
-cscript configure.js include=%PREFIX%\include\libxml2 prefix=%PREFIX% static=yes debug=no arch=%PLATFORM_NAME%
+cscript configure.js include=%PREFIX%\include\libxml2 prefix=%PREFIX% static=yes debug=no arch=%PLATFORM_NAME% cruntime=/MT
 nmake all
 nmake install
 cd ..\..
