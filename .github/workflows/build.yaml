@@ -43,7 +43,7 @@ jobs:
             brew cleanup -s libxml2 libxslt libffi &&
             brew cleanup --prune-prefix &&
             brew install libxml2 libxslt automake pkg-config
-          CIBW_BEFORE_ALL_WINDOWS: "cmd.exe /C xmlstarlet\\build_msvc.bat"
+          CIBW_BEFORE_ALL_WINDOWS: "call xmlstarlet\\build_msvc.bat"
           CIBW_ENVIRONMENT_MACOS: >
             ARCHFLAGS="-arch x86_64"
             PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/opt/libxslt/lib/pkgconfig"
