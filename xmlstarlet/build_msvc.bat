@@ -23,26 +23,29 @@ tar -xf %XML2_TARBALL%
 wget --output-document=%XSLT_TARBALL% %XSLT_URL%%XSLT_TARBALL%
 tar -xf %XSLT_TARBALL%
 
+echo Building libxml2...
+cd libxml2-2.9.1\win32
+
+cscript configure.js debug=no static=yes compiler=msvc iconv=no python=no prefix=%PREFIX%
+
 rem Patch the win32config.h to make it compatible with VS 2015+ (libxml2)
 type ..\libxml2\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\libxml2\win32config.h.patch
 copy ..\libxml2\win32config.h.patch ..\libxml2\win32config.h
 del ..\libxml2\win32config.h.patch
 
-rem Patch the win32config.h to make it compatible with VS 2015+ (libxslt)
-type ..\libxslt\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\libxslt\win32config.h.patch
-copy ..\libxslt\win32config.h.patch ..\libxslt\win32config.h
-del ..\libxslt\win32config.h.patch
-
-echo Building libxml2...
-cd libxml2-2.9.1\win32
-cscript configure.js debug=no static=yes compiler=msvc iconv=no python=no prefix=%PREFIX%
 nmake all
 nmake install
 cd ..\..
 
 echo Building libxslt...
 cd libxslt-1.1.28\win32
+
 cscript configure.js debug=no static=yes compiler=msvc iconv=no debugger=no include=%PREFIX%\include\libxml2 lib=%PREFIX%\lib prefix=%PREFIX%
+
+rem Patch the win32config.h to make it compatible with VS 2015+ (libxslt)
+type ..\libxslt\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\libxslt\win32config.h.patch
+copy ..\libxslt\win32config.h.patch ..\libxslt\win32config.h
+del ..\libxslt\win32config.h.patch
 
 rem Patch the Makefile to exclude unsupported /OPT:NOWIN98 link.exe option
 type Makefile | sed -e "s/LDFLAGS = .*OPT:NOWIN98//g" > Makefile.patch
