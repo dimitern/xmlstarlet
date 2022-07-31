@@ -35,8 +35,8 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: >
               ARCHFLAGS="-arch i386 -arch x86_64"
               PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/opt/libxslt/lib/pkgconfig"
-              LDFLAGS="-L/usr/local/opt/libxml2/lib" "-L/usr/local/opt/libxslt/lib"
-              CPPFLAGS="-I/usr/local/opt/libxml2/include" "-I/usr/local/opt/libxslt/include"
+              LDFLAGS="-L/usr/local/opt/libxml2/lib -L/usr/local/opt/libxslt/lib"
+              CPPFLAGS="-I/usr/local/opt/libxml2/include -I/usr/local/opt/libxslt/include -I/usr/local/opt/libffi/include"
           CIBW_BEFORE_BUILD_MACOS: >
               brew uninstall --force libxml2 libxslt libffi &&
               brew cleanup -s libxml2 libxslt libffi &&
