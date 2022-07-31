@@ -32,9 +32,12 @@ rem Patch the win32config.h / config.h to make it compatible with VS 2015+ (libx
 type ..\include\win32config.h | sed -e "s/#define snprintf _snprintf//g" > ..\include\win32config.h.patch
 copy ..\include\win32config.h.patch ..\include\win32config.h
 del ..\include\win32config.h.patch
+type ..\include\win32config.h
+
 type VC10\config.h | sed -e "s/#define snprintf _snprintf//g" > VC10\config.h.patch
 copy VC10\config.h.patch VC10\config.h
 del VC10\config.h.patch
+type VC10\config.h
 
 nmake all
 nmake install
