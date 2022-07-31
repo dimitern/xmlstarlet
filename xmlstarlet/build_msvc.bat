@@ -16,6 +16,7 @@ md _build
 
 rem Kill Git's link.exe which shadows MSVC's link.exe
 if exist "C:\Program Files\Git\usr\bin\link.exe" del "C:\Program Files\Git\usr\bin\link.exe"
+if exist "C:\Program Files (x86)\Git\usr\bin\link.exe" del "C:\Program Files (x86)\Git\usr\bin\link.exe"
 
 echo Fetching sources for dependencies...
 cd _build\
