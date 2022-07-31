@@ -28,7 +28,6 @@ jobs:
 
       - name: Prepare Windows builds
         uses: ilammy/msvc-dev-cmd@v1
-        shell: cmd
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
