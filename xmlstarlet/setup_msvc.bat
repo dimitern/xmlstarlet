@@ -14,6 +14,9 @@ if exist %PREFIX% rd /q /s %PREFIX%
 if exist _build rd /q /s _build
 md _build
 
+if exist "C:\Program Files\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" call "C:\Program Files\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+
 rem Kill Git's link.exe which shadows MSVC's link.exe
 if exist "C:\Program Files\Git\usr\bin\link.exe" del "C:\Program Files\Git\usr\bin\link.exe"
 if exist "C:\Program Files (x86)\Git\usr\bin\link.exe" del "C:\Program Files (x86)\Git\usr\bin\link.exe"
