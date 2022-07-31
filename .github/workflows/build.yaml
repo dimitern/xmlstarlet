@@ -27,15 +27,48 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3
 
-      - name: Prepare Windows builds
+      - name: Prepare Windows x86 builds
         uses: ilammy/msvc-dev-cmd@v1
         with:
           toolset: "14.0"
-          arch: ${{ matrix.arch }}
+          arch: "x86"
 
-      - name: Build wheels
+      - name: Build Windows x86 wheels
         uses: pypa/cibuildwheel@v2.8.1
         env:
+          CIBW_BUILD: "*win32"
+          CIBW_BEFORE_BUILD_WINDOWS: "call xmlstarlet\\setup_msvc.bat"
+          CIBW_ENVIRONMENT_WINDOWS: >
+            PLATFORM_NAME=x86
+            DISTUTILS_USE_SDK=1
+            MSSdk=1
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+
+      - name: Prepare Windows x64 builds
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: "14.0"
+          arch: "x64"
+
+      - name: Build Windows x86 wheels
+        uses: pypa/cibuildwheel@v2.8.1
+        env:
+          CIBW_BUILD: "*win_amd64"
+          CIBW_BEFORE_BUILD_WINDOWS: "call xmlstarlet\\setup_msvc.bat"
+          CIBW_ENVIRONMENT_WINDOWS: >
+            PLATFORM_NAME=amd64
+            DISTUTILS_USE_SDK=1
+            MSSdk=1
+        with:
+          package-dir: .
+          output-dir: wheelhouse
+
+      - name: Build Linux and MacOS wheels
+        uses: pypa/cibuildwheel@v2.8.1
+        env:
+          CIBW_SKIP: "*win*"
           CIBW_BEFORE_ALL_LINUX: >
             yum install -y libxslt-devel ||
             apt-get -y install libxslt1-dev libxml2-dev ||
@@ -45,18 +78,12 @@ jobs:
             brew cleanup -s libxml2 libxslt libffi &&
             brew cleanup --prune-prefix &&
             brew install libxml2 libxslt automake pkg-config
-          CIBW_BEFORE_ALL_WINDOWS: "call xmlstarlet\\setup_msvc.bat"
-          CIBW_BEFORE_BUILD_WINDOWS: "call xmlstarlet\\build_msvc.bat"
           CIBW_ENVIRONMENT_MACOS: >
             ARCHFLAGS="-arch x86_64"
             PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/opt/libxslt/lib/pkgconfig"
             LDFLAGS="-L/usr/local/opt/libxml2/lib -L/usr/local/opt/libxslt/lib"
             CPPFLAGS="-I/usr/local/opt/libxml2/include -I/usr/local/opt/libxslt/include -I/usr/local/opt/libffi/include"
             PATH="/usr/local/opt/libxslt/bin:/usr/local/opt/libxml2/bin:$PATH"
-          CIBW_ENVIRONMENT_WINDOWS: >
-            CIBW_BUILD="*win32 *win_amd64"
-            DISTUTILS_USE_SDK=1
-            MSSdk=1
         with:
           package-dir: .
           output-dir: wheelhouse
