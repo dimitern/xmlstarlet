@@ -1,6 +1,6 @@
 @echo off
 
-choco install -y -r tartool wget sed gawk nmake
+choco install -y -r tartool wget sed gawk
 
 set BASE_URL=ftp://xmlsoft.org/libxml2/
 set XML2_TARBALL=libxml2-2.9.14.tar.gz
