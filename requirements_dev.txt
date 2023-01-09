@@ -6,7 +6,7 @@ flake8<7.0
 isort
 pylint
 pytest
-Sphinx<5.4
+Sphinx<6.2
 sphinxcontrib-applehelp
 sphinxcontrib-devhelp
 sphinxcontrib-htmlhelp
