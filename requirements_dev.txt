@@ -18,5 +18,5 @@ twine
 auditwheel
 # Last supported version of markupsafe for 3.6.
 markupsafe==2.0.1 ; python_version < '3.7'
-markupsafe==2.1.1 ; python_version > '3.6'
+markupsafe==2.1.2 ; python_version > '3.6'
 importlib-metadata>=4.4
