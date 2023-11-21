@@ -1,6 +1,9 @@
 /*  $Id: trans.c,v 1.19 2004/11/22 02:28:21 mgrouch Exp $  */
 
 #include <config.h>
+
+#include <libxml/xmlsave.h>
+
 #include "trans.h"
 #include "xmlstar.h"
 
