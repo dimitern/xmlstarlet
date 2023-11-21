@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <libxml/xmlmemory.h>
 #include <libxml/debugXML.h>
 #include <libxml/xmlIO.h>
+#include <libxml/xmlsave.h>
 #include <libxml/HTMLtree.h>
 #include <libxml/xinclude.h>
 #include <libxml/xpath.h>

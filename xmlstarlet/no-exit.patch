@@ -588,9 +588,9 @@ index e199178..afd931b 100644
      const edOptions* g_ops)
  {
 @@ -559,7 +569,7 @@ edOutput(const char* filename, const XmlEdAction* ops, int ops_count,
+     {
          cleanupNSArr(ns_arr);
          xmlCleanupParser();
-         xmlCleanupGlobals();
 -        exit(EXIT_BAD_FILE);
 +        return EXIT_BAD_FILE;
      }
@@ -658,7 +658,7 @@ index e199178..afd931b 100644
          if (arg[0] == '-')
          {
              if (ops_count >= max_ops_count)
-@@ -741,17 +763,23 @@ edMain(int argc, char **argv)
+@@ -741,16 +763,22 @@ edMain(int argc, char **argv)
  
      if (i >= argc)
      {
@@ -682,7 +682,6 @@ index e199178..afd931b 100644
      xmlFree(ops);
      cleanupNSArr(ns_arr);
      xmlCleanupParser();
-     xmlCleanupGlobals();
 -    return 0;
 +
 +    return ret;
