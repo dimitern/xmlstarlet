@@ -104,7 +104,7 @@ void reportGenericError(void* ctx, const char * msg, ...) {
 /* by default all errors are reported */
 static ErrorInfo errorInfo = { NULL, NULL, VERBOSE, CONTINUE };
 
-void reportError(void *ptr, xmlErrorPtr error)
+void reportError(void *ptr, const xmlError *error)
 {
     ErrorInfo *errorInfo = (ErrorInfo*) ptr;
     assert(errorInfo);

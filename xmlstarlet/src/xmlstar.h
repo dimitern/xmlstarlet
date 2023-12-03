@@ -32,7 +32,7 @@ typedef struct _errorInfo {
     ErrorStop stop;
 } ErrorInfo;
 
-void reportError(void *ptr, xmlErrorPtr error);
+void reportError(void *ptr, const xmlError *error);
 void suppressErrors(void);
 
 typedef struct _gOptions {
